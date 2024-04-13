@@ -1,4 +1,4 @@
-import settings
+import utils.settings as settings
 import discord
 from old.responses import get_response
 from discord.ext import commands

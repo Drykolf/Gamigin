@@ -3,3 +3,4 @@
 /.env
 /venv
 /cogs/__pycache__
+/utils/__pycache__
