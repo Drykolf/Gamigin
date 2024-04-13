@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands, tasks
 import settings
 from itertools import cycle
+
 #Bot setup
 intents: discord.Intents = discord.Intents.default()
 intents.typing = False
