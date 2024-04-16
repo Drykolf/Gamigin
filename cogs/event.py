@@ -10,7 +10,15 @@ class EventHandlers(commands.Cog):
         #...
         print(f'Logged in as {self.bot.user}')
         await self.bot.change_presence(activity=discord.Game("Probando..."))
-        
+    
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        pass
+    
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild):
+        pass
+    
     ''' @commands.Cog.listener()
     async def on_member_join(self, member):
         async with self.bot.db_pool.acquire() as conn:
