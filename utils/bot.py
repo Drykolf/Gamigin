@@ -11,15 +11,15 @@ class Gamigin(commands.Bot):
         *args,
         initialExtensions: List[str],
         dbPool: asyncpg.Pool,
-        testingGuildId: Optional[int] = settings.TEST_GUILD,
-        allowedGuilds: Optional[List[int]] = [settings.TEST_GUILD],
+        testingGuildId: Optional[str] = settings.TEST_GUILD,
+        allowedGuild: Optional[str] = [settings.TEST_GUILD],
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.dbPool = dbPool
         self.testingGuildId = testingGuildId
         self.initialExtensions = initialExtensions
-        self.allowedGuilds = allowedGuilds
+        self.allowedGuild = allowedGuild
 
     async def setup_hook(self) -> None:
         if self.dbPool is None:
@@ -39,8 +39,11 @@ class Gamigin(commands.Bot):
         await db.create_dino_datatable(self.dbPool)
         await db.create_dino_capacities_datatable(self.dbPool)
         await db.create_dino_classifications_datatable(self.dbPool)
+        await db.create_shiny_essences_datatable(self.dbPool)
         await db.create_player_dino_datatable(self.dbPool)
         await db.create_player_dino_capacities_datatable(self.dbPool)
         await db.create_player_dino_classifications_datatable(self.dbPool)
-        await db.create_shiny_essences_datatable(self.dbPool)
-        await db.add_constraints(self.dbPool)
+        await db.create_abilityrolls_datatable(self.dbPool)
+        await db.create_abilityrolls_bonuses_datatable(self.dbPool)
+        await db.create_player_bonuses_table(self.dbPool)
+        

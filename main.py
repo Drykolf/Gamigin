@@ -1,7 +1,6 @@
 import asyncio
 import os
 from typing import List
-from discord.ext import commands
 import asyncpg
 from discord import Intents
 import utils.settings as settings
@@ -42,10 +41,10 @@ async def main():
             dbPool=pool,
             initialExtensions=exts,
             intents=intents,
-            allowedGuilds=[settings.GAH_SERVER]
+            allowedGuild=settings.GAH_SERVER
         ) as bot:
             try:
-                #await bot.create_tables()
+                await bot.create_tables()
                 await bot.start(settings.TOKEN)
             finally:
                 await bot.dbPool.close()

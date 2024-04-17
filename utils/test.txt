@@ -1,0 +1,21 @@
+Tek:
+Geology
+Flora and Fauna
+Creature Handling
+Mystical
+Social
+History
+Insight
+Stealth
+Investigation
+Perception
+Mining
+Herbalism
+Fishing
+Digging
+Salvaging
+Hunting
+Scouting
+Lock Picking
+Dexterity
+Companion
