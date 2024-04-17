@@ -3,7 +3,7 @@ from discord import Object
 from discord.ext import commands
 from typing import List, Optional
 import utils.settings as settings
-import schemas.rpg_db as db
+import schemas.rpg.db_create as db
 
 class Gamigin(commands.Bot):
     def __init__(
@@ -47,3 +47,9 @@ class Gamigin(commands.Bot):
         await db.create_abilityrolls_bonuses_datatable(self.dbPool)
         await db.create_player_bonuses_table(self.dbPool)
         
+    async def starting_data(self) -> None:
+        import schemas.rpg.admin_queries as ra
+        #await ra.register_starting_capacities(self.dbPool)
+        #await ra.register_starting_classifications(self.dbPool)
+        #await ra.register_starting_abilities(self.dbPool)
+        #await ra.register_starting_essences(self.dbPool)

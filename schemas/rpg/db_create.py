@@ -22,7 +22,7 @@ async def create_dino_classifications_datatable(pool) -> None:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS DinoClassifications (
                     id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                    name varchar(50) NOT NULL,
+                    name varchar(50) NOT NULL UNIQUE,
                     description text ,
                     bonus text,
                     PRIMARY KEY (id)
@@ -38,7 +38,7 @@ async def create_dino_capacities_datatable(pool) -> None:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS DinoCapacities (
                     id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                    name varchar(50) NOT NULL,
+                    name varchar(50) NOT NULL UNIQUE,
                     description text ,
                     PRIMARY KEY (id)
                 )
@@ -53,8 +53,9 @@ async def create_shiny_essences_datatable(pool) -> None:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS ShinyEssences (
                     id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                    shiny_name text NOT NULL,
-                    shiny_description text ,
+                    shiny_name varchar(50) NOT NULL UNIQUE,
+                    shiny_description text,
+                    shiny_mastery text,
                     PRIMARY KEY (id)
                 )
             ''')
@@ -121,7 +122,7 @@ async def create_abilityrolls_datatable(pool) -> None:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS AbilityRolls (
                     id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                    ability varchar(50) NOT NULL,
+                    ability varchar(50) NOT NULL UNIQUE,
                     description text,
                     PRIMARY KEY (id)
                 )

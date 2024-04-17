@@ -6,14 +6,6 @@ from discord import Intents
 import utils.settings as settings
 from utils.bot import Gamigin
 
-'''async def get_server_prefix(client, message):
-    async with self.bot.db_pool.acquire() as conn:
-    result = await conn.fetchrow("SELECT serverid, join_role, join_message, leave_message, moderation_logs, welcome_logs FROM setupBot WHERE serverID = $1", member.guild.id)
-    guild_config = dict(result) if result else None
-    async with self.bot.db_pool.acquire() as connection:
-    await connection.execute("DELETE FROM setup_bot WHERE server_id = $1", guild.id)  
-    return prefix''' 
-    
 def get_intents() -> Intents:
     intents: Intents = Intents.default()
     intents.typing = False
@@ -45,6 +37,7 @@ async def main():
         ) as bot:
             try:
                 #await bot.create_tables()
+                #await bot.starting_data()
                 await bot.start(settings.TOKEN)
             finally:
                 await bot.dbPool.close()
