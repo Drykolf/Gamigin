@@ -41,10 +41,10 @@ async def main():
             dbPool=pool,
             initialExtensions=exts,
             intents=intents,
-            allowedGuild=settings.GAH_SERVER
+            allowedGuild=settings.TEST_SERVER_ID
         ) as bot:
             try:
-                await bot.create_tables()
+                #await bot.create_tables()
                 await bot.start(settings.TOKEN)
             finally:
                 await bot.dbPool.close()

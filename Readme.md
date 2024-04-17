@@ -1,6 +1,8 @@
 #python -m pip freeze > requirements.txt
 
 todo
+inventory system
+
 const stageList = {
 0 : 'Done',
 1 : 'Baby',

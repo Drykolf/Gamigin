@@ -63,6 +63,7 @@ async def create_player_dino_datatable(pool) -> None:
     #regplayer, admin (will add capacities and classifications)
     #regplayer $user
     # delplayer, admin
+    #edtplayer, admin
     # players, player $user
     async with pool.acquire() as connection:
         await connection.execute('''
@@ -71,8 +72,8 @@ async def create_player_dino_datatable(pool) -> None:
                     user_id varchar(50) NOT NULL UNIQUE,
                     dino_type varchar(50) NOT NULL,
                     dino_name varchar(50) NOT NULL,
-                    dino_status varchar(50) NOT NULL DEFAULT "alive",
-                    dino_personality text NOT NULL DEFAULT "Shy",
+                    dino_status varchar(50) NOT NULL DEFAULT 'alive',
+                    dino_personality text NOT NULL DEFAULT 'Shy',
                     dino_shiny_essence varchar(50) NOT NULL,
                     dino_imprinting int NOT NULL DEFAULT 0,
                     dino_relationship  int NOT NULL DEFAULT 0,
@@ -86,7 +87,7 @@ async def create_player_dino_datatable(pool) -> None:
             ''')
 
 async def create_player_dino_classifications_datatable(pool) -> None:
-    #setplayerclass, admin
+    #addplayerclass, admin
     #delplayerclass, admin
     async with pool.acquire() as connection:
         await connection.execute('''
@@ -99,7 +100,7 @@ async def create_player_dino_classifications_datatable(pool) -> None:
             ''')
         
 async def create_player_dino_capacities_datatable(pool) -> None:
-    #setplayercap, admin
+    #addplayercap, admin
     #delplayercap, admin
     async with pool.acquire() as connection:
         await connection.execute('''
@@ -146,6 +147,7 @@ async def create_player_bonuses_table(pool) -> None:
         await connection.execute('''
             CREATE TABLE IF NOT EXISTS PlayerBonus (
                 id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+                user_id varchar(50) NOT NULL,
                 tek smallint NOT NULL DEFAULT 0,
                 geology smallint NOT NULL DEFAULT 0,
                 flora_and_fauna smallint NOT NULL DEFAULT 0,
@@ -166,17 +168,7 @@ async def create_player_bonuses_table(pool) -> None:
                 scouting smallint NOT NULL DEFAULT 0,
                 lock_picking smallint NOT NULL DEFAULT 0,
                 dexterity smallint NOT NULL DEFAULT 0,
-                companion smallint NOT NULL DEFAULT 0
+                companion smallint NOT NULL DEFAULT 0,
                 PRIMARY KEY (id)
-            )
-        ''')
-
-
-'''INSERT INTO TABLES'''
-async def register_dino_type(pool, dino_type) -> None:
-    async with pool.acquire() as connection:
-        await connection.execute('''INSERT INTO Dinos (dino_type) 
-                                    VALUES ($1) 
-                                    ''', dino_type)
-        row = await connection.fetchrow('SELECT * FROM Dinos WHERE dino_type = $1', dino_type)
-        print(f'Registered {row}')
+                )
+            ''')
