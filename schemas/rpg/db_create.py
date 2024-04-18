@@ -71,11 +71,12 @@ async def create_player_dino_datatable(pool) -> None:
                 CREATE TABLE IF NOT EXISTS PlayerDino (
                     id int GENERATED ALWAYS AS IDENTITY NOT NULL,
                     user_id varchar(50) NOT NULL UNIQUE,
+                    user_name varchar(50) NOT NULL,
                     dino_type varchar(50) NOT NULL,
                     dino_name varchar(50) NOT NULL,
                     dino_status varchar(50) NOT NULL DEFAULT 'alive',
                     dino_personality text NOT NULL DEFAULT 'Shy',
-                    dino_shiny_essence varchar(50) NOT NULL,
+                    dino_shiny_essence varchar(50),
                     dino_imprinting int NOT NULL DEFAULT 0,
                     dino_relationship  int NOT NULL DEFAULT 0,
                     companionship_lvl int NOT NULL DEFAULT 0,

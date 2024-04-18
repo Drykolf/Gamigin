@@ -36,7 +36,7 @@ async def main():
             allowedGuild=settings.TEST_SERVER_ID
         ) as bot:
             try:
-                #await bot.create_tables()
+                await bot.create_tables()
                 #await bot.starting_data()
                 await bot.start(settings.TOKEN)
             finally:
