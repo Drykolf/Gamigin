@@ -75,3 +75,38 @@ async def get_players(pool, arg: str=None) -> list:
                 ''')
         data = [list(row.values()) for row in rows] #Returns a list of all the dino_type values
         return data
+
+async def get_player_info(pool, player: str) -> list:
+    async with pool.acquire() as connection:
+        row = await connection.fetchrow('''
+            SELECT * FROM PlayerDino WHERE user_id = $1
+        ''', player)
+        data = dict(row.items())
+        return data
+
+async def get_player_classifications(pool, player: str) -> list:
+    async with pool.acquire() as connection:
+        rows = await connection.fetch('''
+            SELECT user_id,classification_name FROM PlayerDinoClassifications WHERE user_id = $1
+        ''', player)
+        data = [list(row.values()) for row in rows] #Returns a list of all the dino_type values
+        return data
+
+async def get_player_capacities(pool, player: str) -> list:
+    async with pool.acquire() as connection:
+        rows = await connection.fetch('''
+            SELECT user_id,capacity_name FROM PlayerDinoCapacities WHERE user_id = $1
+        ''', player)
+        data = [list(row.values()) for row in rows] #Returns a list of all the dino_type values
+        return data
+    
+async def get_player_absbonuses(pool, player:str) -> list:
+    async with pool.acquire() as connection:
+        rows = await connection.fetch('''
+            SELECT * FROM PlayerBonus WHERE user_id = '$1'
+        ''', player)
+        data = [list(row.items())[1:] for row in rows] #
+        for item in data:
+            if item[1] == 0:
+                data.remove(item)
+        return data
