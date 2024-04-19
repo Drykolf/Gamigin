@@ -4,7 +4,7 @@ from typing import List
 import asyncpg
 from discord import Intents
 import utils.settings as settings
-from utils.bot import Gamigin
+from utils.bot import Zury
 
 def get_intents() -> Intents:
     intents: Intents = Intents.default()
@@ -28,7 +28,7 @@ async def main():
     async with asyncpg.create_pool(database='postgres', user='postgres', password=settings.LOCAL_PASSWORD) as pool:
         intents = get_intents()
         exts = get_extensions()
-        async with Gamigin(
+        async with Zury(
             command_prefix=settings.DEFAULT_PREFIX,
             dbPool=pool,
             initialExtensions=exts,

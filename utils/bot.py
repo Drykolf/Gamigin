@@ -5,7 +5,7 @@ from typing import List, Optional
 import utils.settings as settings
 import schemas.rpg.db_create as db
 
-class Gamigin(commands.Bot):
+class Zury(commands.Bot):
     def __init__(
         self,
         *args,
