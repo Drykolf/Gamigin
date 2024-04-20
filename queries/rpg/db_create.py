@@ -107,7 +107,7 @@ async def create_player_dino_datatable(pool) -> None:
                     dino_name varchar(50) NOT NULL,
                     dino_status varchar(50) NOT NULL DEFAULT 'alive',
                     dino_personality text NOT NULL DEFAULT 'Unknown',
-                    dino_shiny_essence varchar(50) DEFAULT 'None',
+                    dino_shiny_essence varchar(50) NOT NULL DEFAULT 'None',
                     dino_imprinting int NOT NULL DEFAULT 0,
                     dino_relationship  int NOT NULL DEFAULT 0,
                     companionship_lvl int NOT NULL DEFAULT 0,

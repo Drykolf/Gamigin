@@ -23,13 +23,13 @@ class RPG_Admin(commands.Cog):
         self.abilities = [ability[0] for ability in await get_ability_rolls(self.bot.dbPool)]
     
     async def cog_load(self):
+        #Load abilities for autocomplete
         await self.ability()
         
     @commands.Cog.listener()
     async def on_ready(self):
         print('RPG config cog is ready!')
         
-    
     @commands.command()
     async def testadmin(self, ctx, *args):
         '''This is a test command'''
