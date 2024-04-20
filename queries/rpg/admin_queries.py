@@ -1,4 +1,7 @@
 '''INSERT INTO TABLES'''
+from turtle import update
+
+
 async def register_dino_type(pool, dino_type) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''INSERT INTO Dinos (dino_type) 
@@ -126,6 +129,56 @@ async def set_player_bonus_roll(pool, user_id:str, ability:str, bonus:int,operat
                 WHERE user_id = $1
             ''', user_id)
             
+async def register_player(pool, player_id:str,player_name:str, dino_type:str, dino_name:str):
+    async with pool.acquire() as connection:
+        await connection.execute('''INSERT INTO PlayerDino (user_id, user_name, dino_type, dino_name)
+                                    VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING''', player_id, player_name, dino_type, dino_name)
+
+async def set_player_data(pool, player_id:str, dino_type:str, dino_name:str, dino_status:str, dino_personality:str, dino_shiny_essence:str, 
+                     dino_imprinting:int, dino_relationship:int, companionship_lvl:int, saddle_mastery:int, dino_companionship:int, capacity:int, studious_mastery:int):
+    async with pool.acquire() as connection:
+        query = 'UPDATE PlayerDino SET '
+        update = False
+        if dino_type: 
+            query += f"dino_type = '{dino_type}'," 
+            update=True
+        if dino_name: 
+            query += f"dino_name = '{dino_name}',"
+            update=True
+        if dino_status: 
+            query += f"dino_status = '{dino_status}',"
+            update=True
+        if dino_personality: 
+            query += f"dino_personality = '{dino_personality}',"
+            update=True
+        if dino_shiny_essence: 
+            query += f"dino_shiny_essence = '{dino_shiny_essence}',"
+            update=True
+        if dino_imprinting: 
+            query += f"dino_imprinting = {dino_imprinting},"
+            update=True
+        if dino_relationship: 
+            query += f"dino_relationship = {dino_relationship},"
+            update=True
+        if companionship_lvl: 
+            query += f"companionship_lvl = {companionship_lvl},"
+            update=True
+        if saddle_mastery: 
+            query += f"saddle_mastery = {saddle_mastery},"
+            update=True
+        if dino_companionship: 
+            query += f"dino_companionship = {dino_companionship},"
+            update=True
+        if capacity: 
+            query += f"capacity = {capacity},"
+            update=True
+        if studious_mastery: 
+            query += f"studious_mastery = {studious_mastery},"
+            update=True
+        if update:
+            query = query[:-1] + f" WHERE user_id = $1"
+            print(query)
+            await connection.execute(query, player_id)
 
 
 

@@ -48,7 +48,7 @@ class RPG_Admin(commands.Cog):
                 
     @commands.command(name='deldino')
     async def delete_dino(self, ctx, *args):
-        '''Delete a dino type from the list for the event'''
+        '''TODO Delete a dino type from the list for the event'''
         dino:str = ' '.join(args)
         await ctx.send(f'to be implemented...')
         
@@ -67,7 +67,7 @@ class RPG_Admin(commands.Cog):
         
     @commands.command(name='delclass')
     async def delete_class(self, ctx, *args):
-        '''Delete class'''
+        '''TODO Delete class'''
         clas:str = ' '.join(args)
         await ctx.send(f'to be implemented...')
         
@@ -84,7 +84,7 @@ class RPG_Admin(commands.Cog):
     
     @commands.command(name='delcap')
     async def delete_capacity(self, ctx, *args):
-        '''Delete capacity'''
+        '''TODO Delete capacity'''
         cap:str = ' '.join(args)
         await ctx.send(f'to be implemented...')
         
@@ -103,7 +103,7 @@ class RPG_Admin(commands.Cog):
         
     @commands.command(name='deless')
     async def delete_essence(self, ctx, *args):
-        '''Delete shiny essence'''
+        '''TODO Delete shiny essence'''
         ess:str = ' '.join(args)
         await ctx.send(f'to be implemented...')
         
@@ -120,7 +120,7 @@ class RPG_Admin(commands.Cog):
         
     @commands.command(name='delability')
     async def Delete_abilityroll(self, ctx, *args):
-        '''Delete ability roll'''
+        '''TODO Delete ability roll'''
         await ctx.send(f'to be implemented...')
     
     @app_commands.command(name='setbonus')
@@ -159,39 +159,60 @@ class RPG_Admin(commands.Cog):
         # Then return a list of app_commands.Choice
         return search_results
     
-    @commands.command(name='addplayer')
-    async def register_player(self, ctx, *args):
+    @app_commands.command(name='addplayer')
+    @app_commands.describe(player='The player register for the event')
+    @app_commands.describe(dino_type='The chosen dino')
+    @app_commands.describe(dino_name='The chosen dino name')
+    async def add_player(self, interaction: Interaction,player:Member, dino_type: str, dino_name: str):
         '''Register event player'''
-        await ctx.send(f'to be implemented...')
+        try: 
+            await db.register_player(self.bot.dbPool, str(player.id), player.display_name, dino_type, dino_name)
+            await interaction.response.send_message(f'accepted')
+        except Exception as e:
+            print(e)
+            await interaction.response.send_message(f'Error: Failed to add {player.display_name}')
+    #todo dino_type autocomplete
+    
+    @app_commands.command(name='setplayer')
+    @app_commands.describe(player='The player set the data for')
+    async def set_player(self, interaction: Interaction,player:Member, dino_type: Optional[str], 
+                         dino_name: Optional[str], dino_status: Optional[str], dino_personality: Optional[str],
+                         dino_essence: Optional[str], dino_imprinting: Optional[int], dino_relationship: Optional[int],
+                         companionship_lvl:Optional[int], saddle_mastery: Optional[int], dino_companionship: Optional[int],
+                         capacity: Optional[int], studious_mastery: Optional[int]):
+        '''Updates informations for the selected player'''
+        try: 
+            await db.set_player_data(self.bot.dbPool, str(player.id), dino_type, dino_name, dino_status, dino_personality,
+                                     dino_essence, dino_imprinting, dino_relationship, companionship_lvl, saddle_mastery,
+                                     dino_companionship, capacity, studious_mastery)
+            await interaction.response.send_message(f'accepted')
+        except Exception as e:
+            print(e)
+            await interaction.response.send_message(f'Error: Failed to update player, does {player.display_name} exists?')
     
     @commands.command(name='delplayer')
     async def register_player(self, ctx, *args):
-        '''Delete event player'''
-        await ctx.send(f'to be implemented...')
-        
-    @commands.command(name='edtplayer')
-    async def edit_player(self, ctx, *args):
-        '''Modify event player'''
+        '''TODO Delete event player'''
         await ctx.send(f'to be implemented...')
         
     @commands.command(name='addplayerclass')
     async def add_player_classification(self, ctx, *args):
-        '''Add player dino classification'''
+        '''TODO Add player dino classification'''
         await ctx.send(f'to be implemented...')
     
     @commands.command(name='delplayerclass')
     async def delete_player_classification(self, ctx, *args):
-        '''Delete player dino classification'''
+        '''TODO Delete player dino classification'''
         await ctx.send(f'to be implemented...')
     
     @commands.command(name='addplayercap')
     async def add_player_capacity(self, ctx, *args):
-        '''Add player dino capacity'''
+        '''TODO Add player dino capacity'''
         await ctx.send(f'to be implemented...')
         
     @commands.command(name='delplayercap')
     async def delete_player_capacity(self, ctx, *args):
-        '''Delete player dino capacity'''
+        '''TODO Delete player dino capacity'''
         await ctx.send(f'to be implemented...')
     
     #todo setitem

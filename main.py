@@ -41,5 +41,5 @@ async def main():
                 await bot.start(settings.TOKEN)
             finally:
                 await bot.dbPool.close()
-                
+  
 asyncio.run(main())

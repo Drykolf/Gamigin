@@ -25,7 +25,7 @@ class RPG_Event(commands.Cog):
         
     @commands.command(name='dinos')
     async def show_dino_types(self, ctx, *args):
-        '''Shows the available dinos to be chosen from, for the event'''
+        '''Shows the available dinos to be chosen from'''
         joiner:str = ', '
         if 'list' in args: joiner = '\n'
         result = await rpgDb.get_dinos(self.bot.dbPool)
@@ -36,7 +36,7 @@ class RPG_Event(commands.Cog):
         
     @commands.command(name='classifications')
     async def show_dino_classifications(self, ctx, *args):
-        '''Shows the available dino classifications from the event'''
+        '''Shows the available dino classifications'''
         search = None
         if args:
             search = ' '.join(list(args)).lower()
@@ -50,7 +50,7 @@ class RPG_Event(commands.Cog):
 
     @commands.command(name='capacities')
     async def show_dino_capacities(self, ctx, *args):
-        '''Shows the available dino capacities from the event''' 
+        '''Shows the available dino capacities''' 
         search = None
         if args:
             search = ' '.join(list(args)).lower()
@@ -62,7 +62,7 @@ class RPG_Event(commands.Cog):
         
     @commands.command(name='essences')
     async def show_shiny_essences(self, ctx, *args):
-        '''Shows the available dino essences and their use in the event'''
+        '''Shows the available dino essences and their use'''
         search = None
         if args:
             search = ' '.join(list(args)).lower()
@@ -91,7 +91,7 @@ class RPG_Event(commands.Cog):
     
     @commands.command(name='bonus')
     async def show_abilities(self, ctx,ability:str, user=None):
-        '''Shows player bonus in certain ability rolls'''
+        '''TODO Shows player bonus in certain ability rolls'''
         #bonus hunting
         await ctx.send(f'to be implemented...')
     
@@ -101,27 +101,30 @@ class RPG_Event(commands.Cog):
         if not player:
             player = ctx.author
         #player:Member = ctx.guild.get_member(ctx.author.id)
-        result = await rpgDb.get_player_info(self.bot.dbPool, str(player.id))
-        embedMsg = Embed(title=player.name.capitalize(), color=0x23dfeb)
-        embedMsg.set_thumbnail(url=player.avatar)
-        embedMsg.add_field(name='Chosen Dino',value=result['dino_type'], inline=True)
-        embedMsg.add_field(name='\u200b', value='\u200b')
-        embedMsg.add_field(name='Dino Name',value=result['dino_name'], inline=True)
-        embedMsg.add_field(name='',value='**Dino Personality: **'+result['dino_personality'], inline=False)
-        embedMsg.add_field(name='',value='**Dino Shiny Essence: **'+result['dino_shiny_essence'], inline=False)
-        embedMsg.add_field(name='',value='**Dino Imprinting: **'+str(result['dino_imprinting'])+'%', inline=False)
-        embedMsg.add_field(name='',value='**Dino Relationship: **'+str(result['dino_relationship']), inline=False)
-        embedMsg.add_field(name='',value='**Base Companionship Level: **'+str(result['companionship_lvl']), inline=False)
-        if not result['saddle_mastery']==0:
-            embedMsg.add_field(name='',value='**Saddle Mastery Path: **'+str(result['saddle_mastery']), inline=False)
-        if not result['dino_companionship']==0:
-            embedMsg.add_field(name='',value='**Dino Companionship Path: **'+str(result['dino_companionship']), inline=False)
-        if not result['capacity']==0:
-            embedMsg.add_field(name='',value='**Capacity Path: **'+str(result['capacity']), inline=False)
-        if not result['studious_mastery']==0:
-            embedMsg.add_field(name='',value='**Studious Mastery Path: **'+str(result['studious_mastery']), inline=False)
-        embedMsg.set_footer(text='dino is '+result['dino_status'])
-        await ctx.send(embed=embedMsg)
+        try:
+            result = await rpgDb.get_player_info(self.bot.dbPool, str(player.id))
+            embedMsg = Embed(title=player.name.capitalize(), color=0x23dfeb)
+            embedMsg.set_thumbnail(url=player.avatar)
+            embedMsg.add_field(name='Chosen Dino',value=result['dino_type'], inline=True)
+            embedMsg.add_field(name='\u200b', value='\u200b')
+            embedMsg.add_field(name='Dino Name',value=result['dino_name'], inline=True)
+            embedMsg.add_field(name='',value='**Dino Personality: **'+result['dino_personality'], inline=False)
+            embedMsg.add_field(name='',value='**Dino Shiny Essence: **'+result['dino_shiny_essence'], inline=False)
+            embedMsg.add_field(name='',value='**Dino Imprinting: **'+str(result['dino_imprinting'])+'%', inline=False)
+            embedMsg.add_field(name='',value='**Dino Relationship: **'+str(result['dino_relationship']), inline=False)
+            embedMsg.add_field(name='',value='**Base Companionship Level: **'+str(result['companionship_lvl']), inline=False)
+            if not result['saddle_mastery']==0:
+                embedMsg.add_field(name='',value='**Saddle Mastery Path: **'+str(result['saddle_mastery']), inline=False)
+            if not result['dino_companionship']==0:
+                embedMsg.add_field(name='',value='**Dino Companionship Path: **'+str(result['dino_companionship']), inline=False)
+            if not result['capacity']==0:
+                embedMsg.add_field(name='',value='**Capacity Path: **'+str(result['capacity']), inline=False)
+            if not result['studious_mastery']==0:
+                embedMsg.add_field(name='',value='**Studious Mastery Path: **'+str(result['studious_mastery']), inline=False)
+            embedMsg.set_footer(text='dino is '+result['dino_status'])
+            await ctx.send(embed=embedMsg)
+        except Exception as e:
+            print(e)
         
         
         
