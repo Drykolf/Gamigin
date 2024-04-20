@@ -1,6 +1,6 @@
 from discord.ext import commands, menus
 from discord import Embed, Member
-import schemas.rpg.user_queries as rpgDb
+import queries.rpg.user_queries as rpgDb
 from utils.paginator import CapacitiesPageSource, PlayersPageSource
 
 class RPG_Event(commands.Cog):

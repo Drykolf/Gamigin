@@ -19,16 +19,5 @@ class EventHandlers(commands.Cog):
     async def on_guild_remove(self, guild):
         pass
     
-    ''' @commands.Cog.listener()
-    async def on_member_join(self, member):
-        async with self.bot.db_pool.acquire() as conn:
-            result = await conn.fetchrow("SELECT serverid, join_role, join_message, leave_message, moderation_logs, welcome_logs FROM setupBot WHERE serverID = $1", member.guild.id)
-            guild_config = dict(result) if result else None
-            async with self.bot.db_pool.acquire() as connection:
-            await connection.execute("DELETE FROM setup_bot WHERE server_id = $1", guild.id)
-        print(guild_config)
-        if guild_config:
-            #...'
-    '''
 async def setup(bot):
     await bot.add_cog(EventHandlers(bot))

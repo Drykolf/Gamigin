@@ -4,6 +4,7 @@
 /venv
 /cogs/__pycache__
 /utils/__pycache__
+/queries/__pycache__
+/data/__pycache__
+/queries/rpg/__pycache__
 /schemas/__pycache__
-/assets/__pycache__
-/schemas/rpg/__pycache__

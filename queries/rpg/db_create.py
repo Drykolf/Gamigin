@@ -60,6 +60,37 @@ async def create_shiny_essences_datatable(pool) -> None:
                 )
             ''')
         
+async def create_abilityrolls_datatable(pool) -> None:
+    #informative
+    #regability, admin
+    #delability, admin
+    #viewabilities
+    async with pool.acquire() as connection:
+        await connection.execute('''
+                CREATE TABLE IF NOT EXISTS AbilityRolls (
+                    id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+                    ability varchar(50) NOT NULL UNIQUE,
+                    description text,
+                    PRIMARY KEY (id)
+                )
+            ''')
+
+#deprecated      
+async def create_abilityrolls_bonuses_datatable(pool) -> None:
+    #regbonus $user $ability $bonus:int, admin
+    #delbonus, admin
+    async with pool.acquire() as connection:
+        await connection.execute('''
+                CREATE TABLE IF NOT EXISTS AbilityRollsBonuses (
+                    id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+                    user_id varchar(50) NOT NULL,
+                    ability varchar(50) NOT NULL,
+                    bonus int NOT NULL DEFAULT 1,
+                    description text,
+                    PRIMARY KEY (id)
+                )
+            ''')
+        
 async def create_player_dino_datatable(pool) -> None:
     #regplayer, admin (will add capacities and classifications)
     #regplayer $user
@@ -113,43 +144,13 @@ async def create_player_dino_capacities_datatable(pool) -> None:
                     PRIMARY KEY (id)
                 )
             ''')
-        
-async def create_abilityrolls_datatable(pool) -> None:
-    #informative
-    #regability, admin
-    #delability, admin
-    #viewabilities
-    async with pool.acquire() as connection:
-        await connection.execute('''
-                CREATE TABLE IF NOT EXISTS AbilityRolls (
-                    id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                    ability varchar(50) NOT NULL UNIQUE,
-                    description text,
-                    PRIMARY KEY (id)
-                )
-            ''')
-        
-async def create_abilityrolls_bonuses_datatable(pool) -> None:
-    #regbonus $user $ability $bonus:int, admin
-    #delbonus, admin
-    async with pool.acquire() as connection:
-        await connection.execute('''
-                CREATE TABLE IF NOT EXISTS AbilityRollsBonuses (
-                    id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                    user_id varchar(50) NOT NULL,
-                    ability varchar(50) NOT NULL,
-                    bonus int NOT NULL DEFAULT 1,
-                    description text,
-                    PRIMARY KEY (id)
-                )
-            ''')
 
 async def create_player_bonuses_table(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
             CREATE TABLE IF NOT EXISTS PlayerBonus (
                 id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                user_id varchar(50) NOT NULL,
+                user_id varchar(50) NOT NULL UNIQUE,
                 tek smallint NOT NULL DEFAULT 0,
                 geology smallint NOT NULL DEFAULT 0,
                 flora_and_fauna smallint NOT NULL DEFAULT 0,
@@ -171,6 +172,19 @@ async def create_player_bonuses_table(pool) -> None:
                 lock_picking smallint NOT NULL DEFAULT 0,
                 dexterity smallint NOT NULL DEFAULT 0,
                 companion smallint NOT NULL DEFAULT 0,
+                PRIMARY KEY (id)
+                )
+            ''')
+        
+async def create_group_inventory(pool) -> None:
+    async with pool.acquire() as connection:
+        await connection.execute('''
+            CREATE TABLE IF NOT EXISTS GroupInventory (
+                id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+                item_name varchar(50) NOT NULL UNIQUE,
+                item_quantity int NOT NULL DEFAULT 1,
+                item_class varchar(50) NOT NULL DEFAULT 'Generic items',
+                item_category varchar(50) NOT NULL DEFAULT 'Generic material',
                 PRIMARY KEY (id)
                 )
             ''')

@@ -3,7 +3,7 @@ from discord import Object
 from discord.ext import commands
 from typing import List, Optional
 import utils.settings as settings
-import schemas.rpg.db_create as db
+import queries.rpg.db_create as db
 
 class Zury(commands.Bot):
     def __init__(
@@ -12,7 +12,7 @@ class Zury(commands.Bot):
         initialExtensions: List[str],
         dbPool: asyncpg.Pool,
         testingGuildId: Optional[str] = settings.TEST_GUILD,
-        allowedGuild: Optional[str] = [settings.TEST_GUILD],
+        allowedGuild: Optional[str] = settings.TEST_GUILD,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -34,6 +34,7 @@ class Zury(commands.Bot):
             guild = Object(self.testingGuildId)
             self.tree.copy_global_to(guild=guild)
             await self.tree.sync(guild=guild)
+            print(f'slash commands into test server: {self.testingGuildId}')
     
     async def create_tables(self) -> None:
         await db.create_dino_datatable(self.dbPool)
@@ -44,8 +45,8 @@ class Zury(commands.Bot):
         await db.create_player_dino_capacities_datatable(self.dbPool)
         await db.create_player_dino_classifications_datatable(self.dbPool)
         await db.create_abilityrolls_datatable(self.dbPool)
-        await db.create_abilityrolls_bonuses_datatable(self.dbPool)
         await db.create_player_bonuses_table(self.dbPool)
+        await db.create_group_inventory(self.dbPool)
         
     async def starting_data(self) -> None:
         import schemas.rpg.admin_queries as ra

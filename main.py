@@ -33,7 +33,7 @@ async def main():
             dbPool=pool,
             initialExtensions=exts,
             intents=intents,
-            allowedGuild=settings.TEST_SERVER_ID
+            allowedGuild=settings.MAIN_GUILD
         ) as bot:
             try:
                 await bot.create_tables()
