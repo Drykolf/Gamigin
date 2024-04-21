@@ -1,4 +1,7 @@
+from ast import alias
+from typing import Optional
 from discord.ext import commands, menus
+from discord.ext.commands import Context
 from discord import Embed, Member
 import queries.rpg.user_queries as rpgDb
 from utils.paginator import CapacitiesPageSource, PlayersPageSource
@@ -17,14 +20,15 @@ class RPG_Event(commands.Cog):
     async def on_ready(self):
         print('RPG cog is ready!')
 
-    @commands.command()
-    async def test(self, ctx, *args):
+    @commands.hybrid_command()
+    async def prueba(self, ctx, *, args: Optional[str] = None):
         '''This is a test command'''
-        test:str = ' '.join(args)
+        test = 'hola'
+        if args: test = args
         await ctx.send(f'test {test.capitalize()}')
         
-    @commands.command(name='dinos')
-    async def show_dino_types(self, ctx, *args):
+    @commands.hybrid_command(name='dinos')
+    async def show_dino_types(self, ctx: Context, *, args: Optional[str] = ''):
         '''Shows the available dinos to be chosen from'''
         joiner:str = ', '
         if 'list' in args: joiner = '\n'
@@ -37,12 +41,12 @@ class RPG_Event(commands.Cog):
         embedMsg.add_field(name="Dinos", value=dinos, inline=False)
         await ctx.send(embed=embedMsg)
         
-    @commands.command(name='classifications')
-    async def show_dino_classifications(self, ctx, *args):
+    @commands.hybrid_command(name='classifications', aliases=['class'])
+    async def show_dino_classifications(self, ctx: Context, *, args: Optional[str] = None):
         '''Shows the available dino classifications'''
         search = None
         if args:
-            search = ' '.join(list(args)).lower()
+            search = args.lower()
         result = await rpgDb.get_classifications(self.bot.dbPool,search)
         if result is None:
             await ctx.send('Error fetching classifications')
@@ -54,12 +58,12 @@ class RPG_Event(commands.Cog):
             embedMsg.add_field(name=clas[0],value=info, inline=False)
         await ctx.send(embed=embedMsg)
 
-    @commands.command(name='capacities')
-    async def show_dino_capacities(self, ctx, *args):
+    @commands.hybrid_command(name='capacities', aliases=['caps'])
+    async def show_dino_capacities(self, ctx: Context, *, args: Optional[str] = None):
         '''Shows the available dino capacities''' 
         search = None
         if args:
-            search = ' '.join(list(args)).lower()
+            search = args.lower()
         result = await rpgDb.get_dino_capacities(self.bot.dbPool, search)
         if result is None:
             await ctx.send('Error fetching capacities')
@@ -67,14 +71,16 @@ class RPG_Event(commands.Cog):
         #pagination
         pageSource = CapacitiesPageSource(result, per_page=10)
         menu = menus.MenuPages(pageSource)
+        await ctx.send('Capacities: ', ephemeral=True)
         await menu.start(ctx)
         
-    @commands.command(name='essences')
-    async def show_shiny_essences(self, ctx, *args):
+        
+    @commands.hybrid_command(name='essences', aliases=['ess'])
+    async def show_shiny_essences(self, ctx: Context, *, args: Optional[str] = None):
         '''Shows the available dino essences and their use'''
         search = None
         if args:
-            search = ' '.join(list(args)).lower()
+            search = args.lower()
         result = await rpgDb.get_shiny_essences(self.bot.dbPool, search)
         if result is None:
             await ctx.send('Error fetching essences')
@@ -87,12 +93,12 @@ class RPG_Event(commands.Cog):
             embedMsg.add_field(name=ess[0],value=info, inline=False)
         await ctx.send(embed=embedMsg)
         
-    @commands.command(name='abilities')
-    async def show_player_info(self, ctx, *args):
+    @commands.hybrid_command(name='abilities', aliases=['abs'])
+    async def show_player_info(self, ctx: Context, *, args: Optional[str] = None):
         '''Shows event available ability rolls'''
         search = None
         if args:
-            search = ' '.join(list(args)).lower()
+            search = args.lower()
         result = await rpgDb.get_ability_rolls(self.bot.dbPool, search)
         if result is None:
             await ctx.send('Error fetching abilities')
@@ -110,8 +116,8 @@ class RPG_Event(commands.Cog):
         #bonus hunting
         await ctx.send(f'to be implemented...')
     
-    @commands.command(name='player')
-    async def show_abilities(self, ctx, player: Member = None):
+    @commands.hybrid_command(name='player', aliases=['pl'])
+    async def show_abilities(self, ctx:Context, player: Optional[Member]):
         '''Shows information about the player from the event'''
         if not player:
             player = ctx.author
@@ -144,12 +150,12 @@ class RPG_Event(commands.Cog):
         embedMsg.set_footer(text='dino is '+result['dino_status'])
         await ctx.send(embed=embedMsg)
         
-    @commands.command(name='players')
-    async def show_players(self, ctx, *args):
+    @commands.hybrid_command(name='players', aliases=['pls'])
+    async def show_players(self,  ctx: Context, *, args: Optional[str] = None):
         '''Shows players that are participating in the event'''
         search = None
         if args:
-            search = ' '.join(list(args)).lower()
+            search = args.lower()
         result = await rpgDb.get_players(self.bot.dbPool, search)
         if result is None:
             await ctx.send('Error fetching players')
@@ -158,6 +164,7 @@ class RPG_Event(commands.Cog):
         try:
             pageSource = PlayersPageSource(result, per_page=10)
             menu = menus.MenuPages(pageSource)
+            await ctx.send('Players:', ephemeral=True)
             await menu.start(ctx)
         except Exception as e:
             print(e)

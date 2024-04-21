@@ -1,36 +1,64 @@
 '''INSERT INTO TABLES'''
 from turtle import update
+from unittest import result
 
 
-async def register_dino_type(pool, dino_type) -> None:
+async def register_dino_type(pool, dino_type) -> bool:
     async with pool.acquire() as connection:
-        await connection.execute('''INSERT INTO Dinos (dino_type) 
-                                    VALUES ($1) ON CONFLICT (dino_type) DO NOTHING
-                                    ''', dino_type)
+        query = '''INSERT INTO Dinos (dino_type) 
+                    VALUES ($1) ON CONFLICT (dino_type) DO NOTHING'''
+        try:
+            await connection.execute(query, dino_type)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+async def delete_dino_type(pool, dino_type) -> bool:
+    async with pool.acquire() as connection:
+        query = '''DELETE FROM Dinos WHERE dino_type = $1 RETURNING *'''
+        try:
+            result = await connection.execute(query, dino_type)
+            return result
+        except Exception as e:
+            print(e)
+            return None
         
 async def register_starting_dinos(pool) -> None:
     from data.initial_data import dino_types
     for dino in dino_types:
         await register_dino_type(pool, dino)
         
-async def register_dino_capacity(pool, name, description):
+async def set_dino_capacity(pool, name, description):
     async with pool.acquire() as connection:
         if description:
-            await connection.execute('''
-                INSERT INTO DinoCapacities (name, description) VALUES ($1, $2) 
-                ON CONFLICT (name) DO UPDATE
-                SET description = $2
-            ''', name, description)
+            query = f"""INSERT INTO DinoCapacities (name, description) VALUES ('{name}', '{description}') 
+                    ON CONFLICT (name) DO UPDATE
+                    SET description = '{description}'"""
         else:
-            await connection.execute('''
-                INSERT INTO DinoCapacities (name) VALUES ($1) 
-                ON CONFLICT (name) DO NOTHING
-            ''', name)
+            query = f"""INSERT INTO DinoCapacities (name) VALUES ('{name}') 
+                    ON CONFLICT (name) DO NOTHING"""
+        try:
+            await connection.execute(query)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+        
+async def delete_dino_capacity(pool, name) -> bool:
+    async with pool.acquire() as connection:
+        query = '''DELETE FROM DinoCapacities WHERE name = $1 RETURNING *'''
+        try:
+            result = await connection.execute(query, name)
+            return result
+        except Exception as e:
+            print(e)
+            return None
         
 async def register_starting_capacities(pool) -> None:
     from data.initial_data import dino_capacities
     for cap in dino_capacities:
-        await register_dino_capacity(pool, cap[0], cap[1])
+        await set_dino_capacity(pool, cap[0], cap[1])
         
 async def register_classification(pool, name, description, bonus):
     async with pool.acquire() as connection:

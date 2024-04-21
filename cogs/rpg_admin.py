@@ -40,17 +40,22 @@ class RPG_Admin(commands.Cog):
     @app_commands.describe(type='The dino to add')
     async def register_dino(self, interaction: Interaction, type: str):
         """Registers a new dino type to be available for the event"""
-        try:
-            await db.register_dino_type(self.bot.dbPool, type.capitalize())
+        if await db.register_dino_type(self.bot.dbPool, type.capitalize()):
             await interaction.response.send_message(f'Dino {type} registered')
-        except Exception as e:
+        else:
             await interaction.response.send_message(f'Error: Failed to register {type} dino')
-                
-    @commands.command(name='deldino')
-    async def delete_dino(self, ctx, *args):
-        '''TODO Delete a dino type from the list for the event'''
-        dino:str = ' '.join(args)
-        await ctx.send(f'to be implemented...')
+    
+    @app_commands.command(name='deldino')
+    @app_commands.describe(type='The dino to delete')
+    async def delete_dino(self, interaction: Interaction, type: str):
+        """Deletes a dino type from the selection"""
+        result = await db.delete_dino_type(self.bot.dbPool, type.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {type} dino not found'
+            else: msg = f'Dino {type} deleted'
+        else: msg = f'Error: Failed to delete {type} dino'
+        await interaction.response.send_message(msg)
         
     @app_commands.command(name='setclassification')
     @app_commands.describe(clas='The classification to add or edit')
@@ -76,17 +81,23 @@ class RPG_Admin(commands.Cog):
     @app_commands.describe(description='The capacity description to add or update')
     async def set_capacity(self, interaction: Interaction, capacity: str, description: Optional[str]):
         """Registers or edits a dino capacity"""
-        try:
-            await db.register_dino_capacity(self.bot.dbPool, capacity.capitalize(), description)
-            await interaction.response.send_message(f'Capacity {capacity} registered or updated')
-        except Exception as e:
-            await interaction.response.send_message(f'Error: Failed to set {capacity} capacity')
+        result = await db.set_dino_capacity(self.bot.dbPool, capacity.capitalize(), description)
+        msg = ''
+        if result: msg = f'Capacity {capacity} registered or updated'
+        else: msg = f'Error: Failed to set {capacity} capacity'
+        await interaction.response.send_message(msg)
     
-    @commands.command(name='delcap')
-    async def delete_capacity(self, ctx, *args):
+    @app_commands.command(name='delcapacity')
+    @app_commands.describe(capacity='The capacity to delete')
+    async def delete_capacity(self, interaction: Interaction, capacity: str):
         '''TODO Delete capacity'''
-        cap:str = ' '.join(args)
-        await ctx.send(f'to be implemented...')
+        result = await db.delete_dino_capacity(self.bot.dbPool, capacity.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {capacity} not found'
+            else: msg = f'{capacity} deleted'
+        else: msg = f'Error: Failed to delete {capacity}'
+        await interaction.response.send_message(msg)
         
     @app_commands.command(name='setessence')
     @app_commands.describe(ess='The Essence to add or edit')
@@ -216,12 +227,6 @@ class RPG_Admin(commands.Cog):
         await ctx.send(f'to be implemented...')
     
     #todo setitem
-    
-    @app_commands.command(name='test')
-    #@app_commands.choices(ability=
-    async def add_item(self, interaction: Interaction, player:Member, ability: str) -> None:
-        '''Test slash command'''
-        await interaction.response.send_message('testing')
     
     
 async def setup(bot):
