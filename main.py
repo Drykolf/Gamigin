@@ -21,7 +21,6 @@ def get_extensions() -> List[str]:
     return ext
 
 async def main():
-    print(settings.DEBUG)
     if settings.DEBUG:
         print("DEBUG MODE ON")
         pool = await asyncpg.create_pool(database='postgres', user='postgres', password=settings.LOCAL_PASSWORD)
@@ -40,6 +39,8 @@ async def main():
         allowedGuild=settings.MAIN_GUILD
     ) as bot:
         try:
+            async with pool.acquire() as connection:
+                await connection.execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
             await bot.create_tables()
             await bot.starting_data()
             await bot.start(settings.TOKEN)
