@@ -23,8 +23,10 @@ def get_extensions() -> List[str]:
 async def main():
     print(settings.DEBUG)
     if settings.DEBUG:
+        print("DEBUG MODE ON")
         pool = await asyncpg.create_pool(database='postgres', user='postgres', password=settings.LOCAL_PASSWORD)
     else:
+        print("Production Mode ON")
         pool = await asyncpg.create_pool(database=settings.DATABASE, user=settings.USER, 
                                         password= settings.PASSWORD, host=settings.HOST, 
                                         ssl='require', command_timeout=30)
