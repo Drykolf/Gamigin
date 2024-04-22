@@ -1,8 +1,19 @@
 #python -m pip freeze > requirements.txt
 
-todo
-inventory system
+TODO
 
+1. inventory system
+2. Caravan
+3. user notes
+4. Hatchery
+5. Merchants
+6. Logger
+
+For notes
+id, userId, note
+?note, ?delnote(dn) id
+
+For hatchery:
 const stageList = {
 0 : 'Done',
 1 : 'Baby',
@@ -26,13 +37,6 @@ infoChannelID: String,
 logsChannelID: String,
 merchantsChannelID: String,
 hatcheryChannelID: String,
-}
-
----
-
-const rpgInventorySchemna = new Schema({
-GuildID: String,
-Items: Array,
 }
 
 ---

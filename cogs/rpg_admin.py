@@ -1,5 +1,5 @@
 from re import search
-from typing import Literal, Optional
+from typing import Optional
 from discord.ext import commands
 from discord import Interaction, Member, app_commands
 import queries.rpg.admin_queries as db
@@ -45,6 +45,7 @@ class RPG_Admin(commands.Cog):
         else:
             await interaction.response.send_message(f'Error: Failed to register {type} dino')
     
+    #TODO autocomplete
     @app_commands.command(name='deldino')
     @app_commands.describe(type='The dino to delete')
     async def delete_dino(self, interaction: Interaction, type: str):
@@ -56,26 +57,8 @@ class RPG_Admin(commands.Cog):
             else: msg = f'Dino {type} deleted'
         else: msg = f'Error: Failed to delete {type} dino'
         await interaction.response.send_message(msg)
-        
-    @app_commands.command(name='setclassification')
-    @app_commands.describe(clas='The classification to add or edit')
-    @app_commands.rename(clas='classification')
-    @app_commands.describe(description='The classification description to add or update')
-    @app_commands.describe(bonus='The classification bonus to add or update')
-    async def set_classification(self, interaction: Interaction, clas: str, description: Optional[str], bonus: Optional[str]):
-        """Registers or edits a dino classification"""
-        try:
-            await db.register_classification(self.bot.dbPool, clas.capitalize(), description, bonus)
-            await interaction.response.send_message(f'Classification {clas} registered or updated')
-        except Exception as e:
-            await interaction.response.send_message(f'Error: Failed to set {clas} classification')
-        
-    @commands.command(name='delclass')
-    async def delete_class(self, ctx, *args):
-        '''TODO Delete class'''
-        clas:str = ' '.join(args)
-        await ctx.send(f'to be implemented...')
-        
+    
+    #TODO autocomplete
     @app_commands.command(name='setcapacity')
     @app_commands.describe(capacity='The capacity to add or edit')
     @app_commands.describe(description='The capacity description to add or update')
@@ -86,11 +69,12 @@ class RPG_Admin(commands.Cog):
         if result: msg = f'Capacity {capacity} registered or updated'
         else: msg = f'Error: Failed to set {capacity} capacity'
         await interaction.response.send_message(msg)
-    
+        
+    #TODO autocomplete
     @app_commands.command(name='delcapacity')
     @app_commands.describe(capacity='The capacity to delete')
     async def delete_capacity(self, interaction: Interaction, capacity: str):
-        '''TODO Delete capacity'''
+        '''Deletes a capacity'''
         result = await db.delete_dino_capacity(self.bot.dbPool, capacity.capitalize())
         msg = ''
         if(result):
@@ -99,6 +83,58 @@ class RPG_Admin(commands.Cog):
         else: msg = f'Error: Failed to delete {capacity}'
         await interaction.response.send_message(msg)
         
+    #TODO autocomplete
+    @app_commands.command(name='setclassification')
+    @app_commands.describe(clas='The classification to add or edit')
+    @app_commands.rename(clas='classification')
+    @app_commands.describe(description='The classification description to add or update')
+    @app_commands.describe(bonus='The classification bonus to add or update')
+    async def set_classification(self, interaction: Interaction, clas: str, description: Optional[str], bonus: Optional[str]):
+        """Registers or edits a dino classification"""
+        if await db.set_classification(self.bot.dbPool, clas.capitalize(), description, bonus):
+            await interaction.response.send_message(f'Classification {clas} registered or updated')
+        else:
+            await interaction.response.send_message(f'Error: Failed to set {clas} classification')
+    
+    #TODO autocomplete
+    @app_commands.command(name='delclassification')
+    @app_commands.rename(clas='classification')
+    @app_commands.describe(clas='The classification to delete')
+    async def delete_class(self, interaction: Interaction, clas: str):
+        '''Deletes a classification'''
+        result = await db.delete_classification(self.bot.dbPool, clas.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {clas} not found'
+            else: msg = f'{clas} deleted'
+        else: msg = f'Error: Failed to delete {clas}'
+        await interaction.response.send_message(msg)
+    
+    #TODO autocomplete
+    @app_commands.command(name='setability')
+    @app_commands.describe(ability='The ability roll to add or edit')
+    @app_commands.describe(description='The ability roll description to add or update')
+    async def set_ability(self, interaction: Interaction, ability: str, description: Optional[str]):
+        """Registers or edits ability rolls for the event"""
+        if await db.set_ability(self.bot.dbPool, ability.capitalize(), description):
+            await interaction.response.send_message(f'Ability {ability} registered or updated')
+        else:
+            await interaction.response.send_message(f'Error: Failed to set {ability} ability')
+    
+    #TODO autocomplete
+    @app_commands.command(name='delability')
+    @app_commands.describe(ability='The ability roll to remove')
+    async def Delete_abilityroll(self, interaction: Interaction, ability: str):
+        '''Delete ability roll'''
+        result = await db.delete_ability(self.bot.dbPool, ability.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {ability} not found'
+            else: msg = f'{ability} deleted'
+        else: msg = f'Error: Failed to delete {ability}'
+        await interaction.response.send_message(msg)
+        
+    #TODO autocomplete
     @app_commands.command(name='setessence')
     @app_commands.describe(ess='The Essence to add or edit')
     @app_commands.rename(ess='essence')
@@ -106,32 +142,86 @@ class RPG_Admin(commands.Cog):
     @app_commands.describe(mastery='The Essence mastery bonus to add or update')
     async def set_essence(self, interaction: Interaction, ess: str, description: Optional[str], mastery: Optional[str]):
         """Registers or edits a dino Shiny Essence"""
-        try:
-            await db.register_essence(self.bot.dbPool, ess.capitalize(), description, mastery)
+        if await db.set_essence(self.bot.dbPool, ess.capitalize(), description, mastery):
             await interaction.response.send_message(f'Essence {ess} registered or updated')
-        except Exception as e:
+        else:
             await interaction.response.send_message(f'Error: Failed to set {ess} shiny essence')
         
-    @commands.command(name='deless')
-    async def delete_essence(self, ctx, *args):
-        '''TODO Delete shiny essence'''
-        ess:str = ' '.join(args)
+    #TODO autocomplete
+    @app_commands.command(name='delessence')
+    @app_commands.describe(ess='The Essence to remove')
+    @app_commands.rename(ess='essence')
+    async def delete_essence(self, interaction: Interaction, ess: str):
+        '''Delete shiny essence'''
+        result = await db.delete_essence(self.bot.dbPool, ess.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {ess} not found'
+            else: msg = f'{ess} deleted'
+        else: msg = f'Error: Failed to delete {ess}'
+        await interaction.response.send_message(msg)
+    
+    #todo dino_type autocomplete
+    @app_commands.command(name='addplayer')
+    @app_commands.describe(player='The player register for the event')
+    @app_commands.describe(dino_type='The chosen dino')
+    @app_commands.describe(dino_name='The chosen dino name')
+    async def add_player(self, interaction: Interaction,player:Member, dino_type: str, dino_name: str):
+        '''Register event player'''
+        if await db.register_player(self.bot.dbPool, str(player.id), player.display_name, dino_type, dino_name):
+            await interaction.response.send_message(f'accepted')
+        else:
+            await interaction.response.send_message(f'Error: Failed to add {player.display_name}')
+    
+    #TODO autocomplete
+    @app_commands.command(name='setplayer')
+    @app_commands.describe(player='The player set the data for')
+    async def set_player(self, interaction: Interaction,player:Member, dino_type: Optional[str], 
+                         dino_name: Optional[str], dino_status: Optional[str], dino_personality: Optional[str],
+                         dino_essence: Optional[str], dino_imprinting: Optional[int], dino_relationship: Optional[int],
+                         companionship_lvl:Optional[int], saddle_mastery: Optional[int], dino_companionship: Optional[int],
+                         capacity: Optional[int], studious_mastery: Optional[int]):
+        '''Updates informations for the selected player (needs to be already registered)'''
+        result = await db.update_player_data(self.bot.dbPool, str(player.id), dino_type, dino_name, dino_status, dino_personality,
+                                     dino_essence, dino_imprinting, dino_relationship, companionship_lvl, saddle_mastery,
+                                     dino_companionship, capacity, studious_mastery)
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {player.display_name} not found'
+            else: msg = f'{player.display_name} updated'
+        else: msg = f'Error: Failed to update {player.display_name}'
+        await interaction.response.send_message(msg)
+    
+    @app_commands.command(name='delplayer')
+    @app_commands.describe(player='The player to remove')
+    async def delete_player(self, interaction: Interaction,player:Member):
+        '''Delete event player'''
+        result = await db.delete_player(self.bot.dbPool, str(player.id))
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {player.display_name} not found'
+            else: msg = f'{player.display_name} deleted'
+        else: msg = f'Error: Failed to delete {player.display_name}'
+        await interaction.response.send_message(msg)
+        
+    @commands.command(name='addplayerclass')
+    async def add_player_classification(self, ctx, *args):
+        '''TODO Add player dino classification'''
+        await ctx.send(f'to be implemented...')
+    
+    @commands.command(name='delplayerclass')
+    async def delete_player_classification(self, ctx, *args):
+        '''TODO Delete player dino classification'''
+        await ctx.send(f'to be implemented...')
+    
+    @commands.command(name='addplayercap')
+    async def add_player_capacity(self, ctx, *args):
+        '''TODO Add player dino capacity'''
         await ctx.send(f'to be implemented...')
         
-    @app_commands.command(name='setability')
-    @app_commands.describe(ability='The ability roll to add or edit')
-    @app_commands.describe(description='The ability roll description to add or update')
-    async def set_ability(self, interaction: Interaction, ability: str, description: Optional[str]):
-        """Registers or edits ability rolls for the event"""
-        try:
-            await db.register_ability(self.bot.dbPool, ability.capitalize(), description)
-            await interaction.response.send_message(f'Ability {ability} registered or updated')
-        except Exception as e:
-            await interaction.response.send_message(f'Error: Failed to set {ability} ability')
-        
-    @commands.command(name='delability')
-    async def Delete_abilityroll(self, ctx, *args):
-        '''TODO Delete ability roll'''
+    @commands.command(name='delplayercap')
+    async def delete_player_capacity(self, ctx, *args):
+        '''TODO Delete player dino capacity'''
         await ctx.send(f'to be implemented...')
     
     @app_commands.command(name='setbonus')
@@ -170,61 +260,7 @@ class RPG_Admin(commands.Cog):
         # Then return a list of app_commands.Choice
         return search_results
     
-    @app_commands.command(name='addplayer')
-    @app_commands.describe(player='The player register for the event')
-    @app_commands.describe(dino_type='The chosen dino')
-    @app_commands.describe(dino_name='The chosen dino name')
-    async def add_player(self, interaction: Interaction,player:Member, dino_type: str, dino_name: str):
-        '''Register event player'''
-        try: 
-            await db.register_player(self.bot.dbPool, str(player.id), player.display_name, dino_type, dino_name)
-            await interaction.response.send_message(f'accepted')
-        except Exception as e:
-            print(e)
-            await interaction.response.send_message(f'Error: Failed to add {player.display_name}')
-    #todo dino_type autocomplete
     
-    @app_commands.command(name='setplayer')
-    @app_commands.describe(player='The player set the data for')
-    async def set_player(self, interaction: Interaction,player:Member, dino_type: Optional[str], 
-                         dino_name: Optional[str], dino_status: Optional[str], dino_personality: Optional[str],
-                         dino_essence: Optional[str], dino_imprinting: Optional[int], dino_relationship: Optional[int],
-                         companionship_lvl:Optional[int], saddle_mastery: Optional[int], dino_companionship: Optional[int],
-                         capacity: Optional[int], studious_mastery: Optional[int]):
-        '''Updates informations for the selected player'''
-        try: 
-            await db.set_player_data(self.bot.dbPool, str(player.id), dino_type, dino_name, dino_status, dino_personality,
-                                     dino_essence, dino_imprinting, dino_relationship, companionship_lvl, saddle_mastery,
-                                     dino_companionship, capacity, studious_mastery)
-            await interaction.response.send_message(f'accepted')
-        except Exception as e:
-            print(e)
-            await interaction.response.send_message(f'Error: Failed to update player, does {player.display_name} exists?')
-    
-    @commands.command(name='delplayer')
-    async def register_player(self, ctx, *args):
-        '''TODO Delete event player'''
-        await ctx.send(f'to be implemented...')
-        
-    @commands.command(name='addplayerclass')
-    async def add_player_classification(self, ctx, *args):
-        '''TODO Add player dino classification'''
-        await ctx.send(f'to be implemented...')
-    
-    @commands.command(name='delplayerclass')
-    async def delete_player_classification(self, ctx, *args):
-        '''TODO Delete player dino classification'''
-        await ctx.send(f'to be implemented...')
-    
-    @commands.command(name='addplayercap')
-    async def add_player_capacity(self, ctx, *args):
-        '''TODO Add player dino capacity'''
-        await ctx.send(f'to be implemented...')
-        
-    @commands.command(name='delplayercap')
-    async def delete_player_capacity(self, ctx, *args):
-        '''TODO Delete player dino capacity'''
-        await ctx.send(f'to be implemented...')
     
     #todo setitem
     
