@@ -21,25 +21,27 @@ def get_extensions() -> List[str]:
     return ext
 
 async def main():
-    #...
-    ''''async with asyncpg.create_pool(database=settings.DATABASE, user=settings.USER, 
+    if settings.DEBUG:
+        pool = await asyncpg.create_pool(database='postgres', user='postgres', password=settings.LOCAL_PASSWORD)
+    else:
+        pool = await asyncpg.create_pool(database=settings.DATABASE, user=settings.USER, 
                                         password= settings.PASSWORD, host=settings.HOST, 
-                                        ssl='require', command_timeout=30) as pool:'''
-    async with asyncpg.create_pool(database='postgres', user='postgres', password=settings.LOCAL_PASSWORD) as pool:
-        intents = get_intents()
-        exts = get_extensions()
-        async with Zury(
-            command_prefix=settings.DEFAULT_PREFIX,
-            dbPool=pool,
-            initialExtensions=exts,
-            intents=intents,
-            allowedGuild=settings.MAIN_GUILD
-        ) as bot:
-            try:
-                await bot.create_tables()
-                #await bot.starting_data()
-                await bot.start(settings.TOKEN)
-            finally:
-                await bot.dbPool.close()
+                                        ssl='require', command_timeout=30)
+    intents = get_intents()
+    exts = get_extensions()
+    async with Zury(
+        command_prefix=settings.DEFAULT_PREFIX,
+        dbPool=pool,
+        initialExtensions=exts,
+        intents=intents,
+        allowedGuild=settings.MAIN_GUILD
+    ) as bot:
+        try:
+            await bot.create_tables()
+            await bot.starting_data()
+            await bot.start(settings.TOKEN)
+        finally:
+            await bot.dbPool.close()
+    
   
 asyncio.run(main())
