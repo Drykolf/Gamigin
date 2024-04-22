@@ -1,7 +1,4 @@
 '''INSERT INTO TABLES'''
-from turtle import update
-from unittest import result
-
 
 async def register_dino_type(pool, dino_type:str) -> bool:
     async with pool.acquire() as connection:
