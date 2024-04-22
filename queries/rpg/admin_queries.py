@@ -11,7 +11,7 @@ async def register_dino_type(pool, dino_type:str) -> bool:
             await connection.execute(query, dino_type)
             return True
         except Exception as e:
-            print(e)
+            print(f'Register Dino: {e}')
             return False
 
 async def delete_dino_type(pool, dino_type:str) -> str:
@@ -42,7 +42,7 @@ async def set_dino_capacity(pool, name:str, description:str) -> bool:
             await connection.execute(query)
             return True
         except Exception as e:
-            print(e)
+            print(f'Set capacity: {e}')
             return False
         
 async def delete_dino_capacity(pool, name:str) -> str:
@@ -81,7 +81,7 @@ async def set_classification(pool, name:str, description:str, bonus:str) -> bool
             await connection.execute(query)
             return True
         except Exception as e:
-            print(e)
+            print(f'Set classification {name}: {e}')
             return False
             
 async def delete_classification(pool, name:str) -> str:
@@ -111,10 +111,10 @@ async def set_ability(pool, name:str, description:str) -> bool:
         try:
             await connection.execute(query)
             await connection.execute(f'''ALTER TABLE PlayerBonus 
-                                     ADD COLUMN IF NOT EXISTS {name} smallint NOT NULL DEFAULT 0;''')
+                                     ADD COLUMN IF NOT EXISTS {'_'.join(name.split())} smallint NOT NULL DEFAULT 0;''')
             return True
         except Exception as e:
-            print(e)
+            print(f'Set ability {name}: {e}')
             return False
         
 async def delete_ability(pool, name:str) -> str:
@@ -156,7 +156,7 @@ async def set_essence(pool, name:str, description:str, mastery:str) -> bool:
             await connection.execute(query)
             return True
         except Exception as e:
-            print(e)
+            print(f'Set essence: {e}')
             return False
         
 async def delete_essence(pool, name:str) -> str:

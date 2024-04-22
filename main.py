@@ -21,6 +21,7 @@ def get_extensions() -> List[str]:
     return ext
 
 async def main():
+    print(settings.DEBUG)
     if settings.DEBUG:
         pool = await asyncpg.create_pool(database='postgres', user='postgres', password=settings.LOCAL_PASSWORD)
     else:

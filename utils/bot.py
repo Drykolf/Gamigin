@@ -49,8 +49,9 @@ class Zury(commands.Bot):
         await db.create_group_inventory(self.dbPool)
         
     async def starting_data(self) -> None:
-        import schemas.rpg.admin_queries as ra
-        #await ra.register_starting_capacities(self.dbPool)
-        #await ra.register_starting_classifications(self.dbPool)
-        #await ra.register_starting_abilities(self.dbPool)
-        #await ra.register_starting_essences(self.dbPool)
+        import queries.rpg.admin_queries as ra
+        await ra.register_starting_dinos(self.dbPool)
+        await ra.register_starting_capacities(self.dbPool)
+        await ra.register_starting_classifications(self.dbPool)
+        await ra.register_starting_abilities(self.dbPool)
+        await ra.register_starting_essences(self.dbPool)

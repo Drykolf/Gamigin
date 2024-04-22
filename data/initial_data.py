@@ -77,10 +77,10 @@ dino_capacities = [
 ]
 
 dino_classifications = [
-    ["Carnivore", "These Dinos Diet's consist of eating other living things to survive, Top of the food chain!", "Able to unlock Hunting Checks."],
-    ["Herbivore", "These Dinos Diet's consist of eating flora to live and have grown a symbiotic relationship with the environment as well.", "Able to unlock Harvesting Checks"],
-    ["Omnivore", "These Dinos Diet's consist of everything they can shove in their mouths and are very adaptable to changing times.", "Gains Hive Harvesting Capacity (Allows the Dino to harvest all types of Bug Hives).Able to unlock Hunting Checks or Fishing Checks."],
-    ["Piscivore", "These Dinos Diet's Consist of all manners of sea life and fish from the oceans and rivers of their environment.", "Able to unlock Fishing Checks."],
+    ["Carnivore", "These Dinos Diets consist of eating other living things to survive, Top of the food chain!", "Able to unlock Hunting Checks."],
+    ["Herbivore", "These Dinos Diets consist of eating flora to live and have grown a symbiotic relationship with the environment as well.", "Able to unlock Harvesting Checks"],
+    ["Omnivore", "These Dinos Diets consist of everything they can shove in their mouths and are very adaptable to changing times.", "Gains Hive Harvesting Capacity (Allows the Dino to harvest all types of Bug Hives).Able to unlock Hunting Checks or Fishing Checks."],
+    ["Piscivore", "These Dinos Diets Consist of all manners of sea life and fish from the oceans and rivers of their environment.", "Able to unlock Fishing Checks."],
     ["Tek (bionic)", "The product of Element and science has created these amazing creatures, while nature can take its toll on them, they are much easier to bounce back. Mechanical in Nature and thus element, and Tek have advantages here.", "Gain Charge-Cores Revival Capacity (Dino can be attempted to be revived using Charge-Cores). Gains the Tek Dino Capacity (Has a different upgrade path related to Tek upgrades).Unlocks the Salvaging Check."],
     ["Mutated", "Rockwell is a very innovated scientist, its just a shame his ego and self-righteous quest for power consumed all of him. His creations may be what remains of a once bright and scientific mind. Rockwell influences still linger for better or worse,", "Unknown"],
     ["Social", "Friendly to everyone they meet and able to form complex social structures within their groups. See how many friends you can make.", "Gain +1 to Companion Rolls. Gains the Social Dino Capacity (Allows the dino to have similar dinos to itself to fight alongside it, as long as one dino remains the dino has not died.)"],
