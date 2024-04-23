@@ -245,24 +245,61 @@ async def delete_player(pool, player_id:str) -> str:
             print(e)
             return None
         
-        
-        
-        
-        
-
-async def set_player_bonus_roll(pool, user_id:str, ability:str, bonus:int,operator:str):
+async def add_class_player(pool, player_id:str, class_name:str) -> bool:
     async with pool.acquire() as connection:
-        await connection.execute('''INSERT INTO PlayerBonus (user_id) VALUES ($1) ON CONFLICT DO NOTHING''', user_id)
+        query = '''INSERT INTO PlayerDinoClassifications (user_id, classification_name) VALUES ($1, $2) ON CONFLICT DO NOTHING'''
+        try:
+            await connection.execute(query, player_id, class_name)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+async def remove_class_player(pool, player_id:str, class_name:str) -> str:
+    async with pool.acquire() as connection:
+        query = '''DELETE FROM PlayerDinoClassifications WHERE user_id = $1 AND classification_name = $2 RETURNING *'''
+        try:
+            result = await connection.execute(query, player_id, class_name)
+            return result
+        except Exception as e:
+            print(e)
+            return None
+
+async def add_cap_player(pool, player_id:str, cap_name:str) -> bool:
+    async with pool.acquire() as connection:
+        query = '''INSERT INTO PlayerDinoCapacities (user_id, capacity_name) VALUES ($1, $2) ON CONFLICT DO NOTHING'''
+        try:
+            await connection.execute(query, player_id, cap_name)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+    
+async def remove_cap_player(pool, player_id:str, cap_name:str) -> str:
+    async with pool.acquire() as connection:
+        query = '''DELETE FROM PlayerDinoCapacities WHERE user_id = $1 AND capacity_name = $2 RETURNING *'''
+        try:
+            result = await connection.execute(query, player_id, cap_name)
+            return result
+        except Exception as e:
+            print(e)
+            return None
+
+async def set_player_bonus_roll(pool, user_id:str, ability:str, bonus:int,operator:str) -> bool:
+    async with pool.acquire() as connection:
         if(operator):
-            await connection.execute(f'''
-                UPDATE PlayerBonus SET {ability} = {ability} {operator} {bonus}
-                WHERE user_id = $1
-            ''', user_id)
+            query = f'''UPDATE PlayerBonus SET {ability} = {ability} {operator} {bonus}
+                        WHERE user_id = $1'''
         else:
-            await connection.execute(f'''
-                UPDATE PlayerBonus SET {ability} = {bonus}
-                WHERE user_id = $1
-            ''', user_id)
+            query = f'''UPDATE PlayerBonus SET {ability} = {bonus}
+                        WHERE user_id = $1'''
+        try:
+            await connection.execute('''INSERT INTO PlayerBonus (user_id) VALUES ($1) ON CONFLICT DO NOTHING''', user_id)
+            await connection.execute(query, user_id)
+            return True
+        except Exception as e:
+            print(e)
+            return False
             
 
 

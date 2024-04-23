@@ -91,10 +91,10 @@ async def get_player_info(pool, player: str) -> list:
 
 async def get_player_classifications(pool, player: str) -> list:
     async with pool.acquire() as connection:
-        query = '''SELECT user_id,classification_name FROM PlayerDinoClassifications WHERE user_id = $1'''
+        query = '''SELECT classification_name FROM PlayerDinoClassifications WHERE user_id = $1'''
         try:
             rows = await connection.fetch(query, player)
-            data = [list(row.values()) for row in rows]
+            data = [list(row.values())[0] for row in rows]
         except Exception as e:
             print(e)
             data = None
@@ -102,10 +102,10 @@ async def get_player_classifications(pool, player: str) -> list:
 
 async def get_player_capacities(pool, player: str) -> list:
     async with pool.acquire() as connection:
-        query = '''SELECT user_id,capacity_name FROM PlayerDinoCapacities WHERE user_id = $1'''
+        query = '''SELECT capacity_name FROM PlayerDinoCapacities WHERE user_id = $1'''
         try: 
             rows = await connection.fetch(query, player)
-            data = [list(row.values()) for row in rows]
+            data = [list(row.values())[0] for row in rows]
         except Exception as e:
             print(e)
             data = None
@@ -113,10 +113,14 @@ async def get_player_capacities(pool, player: str) -> list:
     
 async def get_player_absbonuses(pool, player:str) -> list:
     async with pool.acquire() as connection:
-        query = '''SELECT * FROM PlayerBonus WHERE user_id = '$1' '''
+        query = '''SELECT * FROM PlayerBonus WHERE user_id = $1 '''
         try:
-            rows = await connection.fetch(query, player)
-            data = [list(row.items())[1:] for row in rows] 
+            row = await connection.fetchrow(query, player)
+            data = []
+            if row:
+                info = list(row.items())[2:]
+                for r in info:
+                    data.append((r[0].replace('_',' '),r[1]))
         except Exception as e:
             print(e)
             data = None

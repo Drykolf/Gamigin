@@ -3,7 +3,7 @@ from typing import Optional
 from discord.ext import commands
 from discord import Interaction, Member, app_commands
 import queries.rpg.admin_queries as db
-from queries.rpg.user_queries import get_ability_rolls
+from queries.rpg.user_queries import get_ability_rolls, get_player_info
 
 class RPG_Admin(commands.Cog):
     def __init__(self, bot):
@@ -117,6 +117,7 @@ class RPG_Admin(commands.Cog):
     async def set_ability(self, interaction: Interaction, ability: str, description: Optional[str]):
         """Registers or edits ability rolls for the event"""
         if await db.set_ability(self.bot.dbPool, ability.capitalize(), description):
+            await self.ability()
             await interaction.response.send_message(f'Ability {ability} registered or updated')
         else:
             await interaction.response.send_message(f'Error: Failed to set {ability} ability')
@@ -130,7 +131,9 @@ class RPG_Admin(commands.Cog):
         msg = ''
         if(result):
             if(result[-1] == '0'): msg = f'Error: {ability} not found'
-            else: msg = f'{ability} deleted'
+            else: 
+                await self.ability()
+                msg = f'{ability} deleted'
         else: msg = f'Error: Failed to delete {ability}'
         await interaction.response.send_message(msg)
         
@@ -168,7 +171,7 @@ class RPG_Admin(commands.Cog):
     @app_commands.describe(dino_name='The chosen dino name')
     async def add_player(self, interaction: Interaction,player:Member, dino_type: str, dino_name: str):
         '''Register event player'''
-        if await db.register_player(self.bot.dbPool, str(player.id), player.display_name, dino_type, dino_name):
+        if await db.register_player(self.bot.dbPool, str(player.id), player.display_name.capitalize(), dino_type.capitalize(), dino_name.capitalize()):
             await interaction.response.send_message(f'accepted')
         else:
             await interaction.response.send_message(f'Error: Failed to add {player.display_name}')
@@ -182,8 +185,8 @@ class RPG_Admin(commands.Cog):
                          companionship_lvl:Optional[int], saddle_mastery: Optional[int], dino_companionship: Optional[int],
                          capacity: Optional[int], studious_mastery: Optional[int]):
         '''Updates informations for the selected player (needs to be already registered)'''
-        result = await db.update_player_data(self.bot.dbPool, str(player.id), dino_type, dino_name, dino_status, dino_personality,
-                                     dino_essence, dino_imprinting, dino_relationship, companionship_lvl, saddle_mastery,
+        result = await db.update_player_data(self.bot.dbPool, str(player.id), dino_type.capitalize(), dino_name.capitalize(), dino_status.capitalize(), dino_personality.capitalize(),
+                                     dino_essence.capitalize(), dino_imprinting, dino_relationship, companionship_lvl, saddle_mastery,
                                      dino_companionship, capacity, studious_mastery)
         msg = ''
         if(result):
@@ -203,26 +206,68 @@ class RPG_Admin(commands.Cog):
             else: msg = f'{player.display_name} deleted'
         else: msg = f'Error: Failed to delete {player.display_name}'
         await interaction.response.send_message(msg)
-        
-    @commands.command(name='addplayerclass')
-    async def add_player_classification(self, ctx, *args):
-        '''TODO Add player dino classification'''
-        await ctx.send(f'to be implemented...')
     
-    @commands.command(name='delplayerclass')
-    async def delete_player_classification(self, ctx, *args):
-        '''TODO Delete player dino classification'''
-        await ctx.send(f'to be implemented...')
+    @app_commands.command(name='addplayerclass')
+    @app_commands.describe(player='The player set the data for')
+    @app_commands.describe(clas='The classification to add')
+    @app_commands.rename(clas='classification')
+    async def add_player_classification(self, interaction: Interaction,player:Member, clas: str):
+        '''Add a player dino classification'''
+        playerInfo = await get_player_info(self.bot.dbPool, str(player.id))
+        if playerInfo is None:
+            await interaction.response.send_message('Error fetching player info')
+            return
+        if playerInfo == []:
+            await interaction.response.send_message('Player not found')
+            return
+        if await db.add_class_player(self.bot.dbPool, str(player.id), clas.capitalize()):
+            await interaction.response.send_message(f'accepted')
+        else:
+            await interaction.response.send_message(f'Error: Failed to add {clas} classification to {player.display_name}')
     
-    @commands.command(name='addplayercap')
-    async def add_player_capacity(self, ctx, *args):
-        '''TODO Add player dino capacity'''
-        await ctx.send(f'to be implemented...')
+    @app_commands.command(name='delplayerclass')
+    @app_commands.describe(player='The player to remove the classification from')
+    @app_commands.describe(clas='The classification to remove')
+    @app_commands.rename(clas='classification')
+    async def delete_player_classification(self, interaction: Interaction,player:Member, clas: str):
+        '''Delete player dino classification'''
+        result = await db.remove_class_player(self.bot.dbPool, str(player.id), clas.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {clas} not found'
+            else: msg = f'{clas} deleted'
+        else: msg = f'Error: Failed to delete {clas}'
+        await interaction.response.send_message(msg)
         
-    @commands.command(name='delplayercap')
-    async def delete_player_capacity(self, ctx, *args):
-        '''TODO Delete player dino capacity'''
-        await ctx.send(f'to be implemented...')
+    @app_commands.command(name='addplayercap')
+    @app_commands.describe(player='The player to add the capacity to')
+    @app_commands.describe(capacity='The capacity to add')
+    async def add_player_capacity(self, interaction: Interaction,player:Member, capacity: str):
+        '''Add a player dino capacity'''
+        playerInfo = await get_player_info(self.bot.dbPool, str(player.id))
+        if playerInfo is None:
+            await interaction.response.send_message('Error fetching player info')
+            return
+        if playerInfo == []:
+            await interaction.response.send_message('Player not found')
+            return
+        if await db.add_cap_player(self.bot.dbPool, str(player.id), capacity.capitalize()):
+            await interaction.response.send_message(f'accepted')
+        else:
+            await interaction.response.send_message(f'Error: Failed to add {capacity} capacity to {player.display_name}')
+    
+    @app_commands.command(name='delplayercap')
+    @app_commands.describe(player='The player to remove the capacity from')
+    @app_commands.describe(capacity='The capacity to remove')
+    async def delete_player_capacity(self, interaction: Interaction,player:Member, capacity: str):
+        '''Delete player dino capacity'''
+        result = await db.remove_cap_player(self.bot.dbPool, str(player.id), capacity.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {capacity} not found'
+            else: msg = f'{capacity} deleted'
+        else: msg = f'Error: Failed to delete {capacity}'
+        await interaction.response.send_message(msg)
     
     @app_commands.command(name='setbonus')
     @app_commands.describe(player='The player to add the bonus to')
@@ -243,11 +288,9 @@ class RPG_Admin(commands.Cog):
             except:
                 await interaction.response.send_message(f'Invalid bonus value')
                 return
-        try:
-            await db.set_player_bonus_roll(self.bot.dbPool, str(player.id), ability, bonus, op)
-            await interaction.response.send_message(f'Set {ogBonus} to {ability} ability for {player.display_name}')
-        except Exception as e:
-            print(e)
+        if await db.set_player_bonus_roll(self.bot.dbPool, str(player.id), ability.capitalize(), bonus, op):
+            await interaction.response.send_message(f'Set {ogBonus} to {ability} ability roll for {player.display_name}')
+        else:
             await interaction.response.send_message(f'Error: Failed to set {ability} bonus')
     
     @set_ability_bonus.autocomplete('ability')

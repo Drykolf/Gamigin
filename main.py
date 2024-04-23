@@ -11,7 +11,7 @@ def get_intents() -> Intents:
     intents.typing = False
     intents.presences = False
     intents.message_content = True
-    intents.message_content = True
+    intents.members = True
     return intents
 def get_extensions() -> List[str]:
     ext: List[str] = []

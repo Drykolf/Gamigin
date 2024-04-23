@@ -110,18 +110,42 @@ class RPG_Event(commands.Cog):
             embedMsg.add_field(name=abi[0],value=abi[1], inline=False)
         await ctx.send(embed=embedMsg)
     
-    @commands.command(name='bonus')
-    async def show_abilities(self, ctx,ability:str, user=None):
-        '''TODO Shows player bonus in certain ability rolls'''
-        #bonus hunting
-        await ctx.send(f'to be implemented...')
+    @commands.hybrid_command(name='bonus', aliases=['b'])
+    async def show_bonuses(self, ctx: Context, *, search: Optional[str] = None, player: Optional[Member] = None):
+        '''Shows player bonus in certain ability rolls'''
+        if search and not player:
+            search = search.lower()
+            try:
+                p = search.split()[-1]
+                player = ctx.guild.get_member(int(p[2:-1]))
+                search = search[:-len(p)-1]
+            except:
+                player = ctx.author
+        if not player:
+            player = ctx.author
+        try:
+            result = await rpgDb.get_player_absbonuses(self.bot.dbPool, str(player.id))
+            if result is None:
+                await ctx.send(f'Error fetching bonuses for player {player.display_name}')
+                return
+            embedMsg = Embed(color=0x00ff00)
+            values = ''
+            for bon in result:
+                if search:
+                    if search in bon[0].lower(): values += f'{bon[0]}: {bon[1]}\n'
+                elif bon[1] != 0:values += f'{bon[0]}: {bon[1]}\n'
+            embedMsg.add_field(name=f"{player.display_name} bonuses",value=values, inline=False)
+            await ctx.send(embed=embedMsg)
+        except Exception as e:
+            print(e)
+            await ctx.send('Error fetching player bonuses')
     
     @commands.hybrid_command(name='player', aliases=['pl'])
     async def show_abilities(self, ctx:Context, player: Optional[Member]):
         '''Shows information about the player from the event'''
         if not player:
             player = ctx.author
-        #player:Member = ctx.guild.get_member(ctx.author.id)
+        #
         result = await rpgDb.get_player_info(self.bot.dbPool, str(player.id))
         if result is None:
             await ctx.send('Error fetching player info')
@@ -147,6 +171,22 @@ class RPG_Event(commands.Cog):
             embedMsg.add_field(name='',value='**Capacity Path: **'+str(result['capacity']), inline=False)
         if not result['studious_mastery']==0:
             embedMsg.add_field(name='',value='**Studious Mastery Path: **'+str(result['studious_mastery']), inline=False)
+        dinoClassifications = await rpgDb.get_player_classifications(self.bot.dbPool, str(player.id))
+        if dinoClassifications is None:
+            await ctx.send('Error fetching player classifications')
+            return
+        if len(dinoClassifications) > 1: 
+            embedMsg.add_field(name='Dino Classifications: ',value='\n'.join(dinoClassifications), inline=True) 
+            embedMsg.add_field(name='\u200b', value='\u200b')
+        elif len(dinoClassifications) == 1:
+            embedMsg.add_field(name='Dino Classifications: ',value=dinoClassifications[0], inline=True)
+            embedMsg.add_field(name='\u200b', value='\u200b')
+        dinoCapacities = await rpgDb.get_player_capacities(self.bot.dbPool, str(player.id))
+        if dinoCapacities is None:
+            await ctx.send('Error fetching player capacities')
+            return
+        if len(dinoCapacities) > 1: embedMsg.add_field(name='Dino Capacities: ',value='\n'.join(dinoCapacities), inline=True)
+        elif len(dinoCapacities) == 1: embedMsg.add_field(name='Dino Capacities: ',value=dinoCapacities[0], inline=True)
         embedMsg.set_footer(text='dino is '+result['dino_status'])
         await ctx.send(embed=embedMsg)
         
