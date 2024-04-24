@@ -1,10 +1,11 @@
-from ast import alias
+from tkinter import E
 from typing import Optional
 from discord.ext import commands, menus
 from discord.ext.commands import Context
-from discord import Embed, Member
-import queries.rpg.user_queries as rpgDb
-from utils.paginator import CapacitiesPageSource, PlayersPageSource
+from discord import Embed, Member, NotFound
+import cogs.queries.db_user as rpgDb
+from cogs.queries.db_admin import set_guild_data
+from cogs.utils.paginator import CapacitiesPageSource, PlayersPageSource
 
 class RPG_Event(commands.Cog):
     def __init__(self, bot):
@@ -20,12 +21,65 @@ class RPG_Event(commands.Cog):
     async def on_ready(self):
         print('RPG cog is ready!')
 
+    async def update_notes_msg(self,ctx:Context) -> None:
+        if (str(ctx.guild.id) in self.bot.guildData):
+            data = self.bot.guildData[str(ctx.guild.id)]
+            if (data['event_chnel_id']!=None):
+                channel = ctx.guild.get_channel(int(data['event_chnel_id']))
+                match data['notes_msg_id']:
+                    case None: return
+                    case '0': return
+                    case '1': 
+                        msg = await channel.send('Notes: ')
+                        await set_guild_data(self.bot.dbPool, str(ctx.guild.id), notes_msg_id=str(msg.id))
+                        data['notes_msg_id'] = str(msg.id)
+                        await self.bot.load_guilds()
+                try:
+                    notesMsg = channel.get_partial_message(int(data['notes_msg_id']))
+                    if (notes := await rpgDb.get_notes(self.bot.dbPool)) is not None:
+                        notesContent = 'Notes: \n' + '\n'.join([f'{note[0]}: {note[1]}' for note in notes])
+                        await notesMsg.edit(content=notesContent)
+                except NotFound as e:
+                    await set_guild_data(self.bot.dbPool, str(ctx.guild.id), notes_msg_id='0')
+                    data['notes_msg_id'] = '0'
+                    await self.bot.load_guilds()
+                except Exception as e:
+                    print(e)
+                    #log error
+                
     @commands.hybrid_command()
     async def prueba(self, ctx, *, args: Optional[str] = None):
         '''This is a test command'''
         test = 'hola'
+        print(self.bot.guildData)
         if args: test = args
         await ctx.send(f'test {test.capitalize()}')
+        
+    @commands.hybrid_command(name='note', aliases=['n'])
+    async def add_note(self, ctx: Context, *, note: str):
+        '''Adds a note for the group'''
+        await ctx.defer()
+        note = note.replace('\'', '\'\'')
+        result = await rpgDb.add_note(self.bot.dbPool, str(ctx.author.id), note)
+        if result:
+            await ctx.send('Note added')
+            await self.update_notes_msg(ctx)
+        else:
+            await ctx.send('Error adding note')
+            
+    @commands.hybrid_command(name='delnote', aliases=['dn'])
+    async def del_note(self, ctx: Context, id:int):
+        '''Deletes a note'''
+        await ctx.defer()
+        result = await rpgDb.delete_note(self.bot.dbPool, id)
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = 'Error: note not found'
+            else: 
+                msg = 'Note deleted'
+                await self.update_notes_msg(ctx)
+        else: msg = 'Error deleting note'
+        await ctx.send(msg)
         
     @commands.hybrid_command(name='dinos')
     async def show_dino_types(self, ctx: Context, *, args: Optional[str] = ''):

@@ -1,9 +1,9 @@
 from re import search
 from typing import Optional
 from discord.ext import commands
-from discord import Interaction, Member, app_commands
-import queries.rpg.admin_queries as db
-from queries.rpg.user_queries import get_ability_rolls, get_player_info
+from discord import Interaction, Member, app_commands, TextChannel, Message
+import cogs.queries.db_admin as db
+from cogs.queries.db_user import get_ability_rolls, get_player_info
 
 class RPG_Admin(commands.Cog):
     def __init__(self, bot):
@@ -18,7 +18,7 @@ class RPG_Admin(commands.Cog):
             await ctx.send(f'You do not have permission to use this command')
             return False
         return True
-    
+        
     async def ability(self)-> None:
         self.abilities = [ability[0] for ability in await get_ability_rolls(self.bot.dbPool)]
     
@@ -34,8 +34,46 @@ class RPG_Admin(commands.Cog):
     async def testadmin(self, ctx, *args):
         '''This is a test command'''
         test:str = ' '.join(args)
+        print(self.bot.guildData)
         await ctx.send(f'test {test.capitalize()}')
     
+    @app_commands.command(name='geteventdata')
+    async def get_event_data(self, interaction: Interaction):
+        '''Get the bot event data'''
+        msg = 'Not yet set'
+        if (str(interaction.guild_id) in self.bot.guildData):
+            data = self.bot.guildData[str(interaction.guild_id)]
+            msg = (f"Guild ID: {data['guild_id']} \n Event Channel ID: {data['event_chnel_id']} \n Info Message ID: {data['info_msg_id']} \n Inventory Message ID: {data['inv_msg_id']} \n" +
+                f"Caravan Message ID: {data['caravan_msg_id']} \n Notes Message ID: {data['notes_msg_id']} \n Caravan Small Slots: {data['caravan_sslots']} \n" +
+                f"Caravan Medium Slots: {data['caravan_mslots']} \n Caravan Large Slots: {data['caravan_lslots']} \n Imprint Bonus: {data['imprint_bonus']}%")
+        await interaction.response.send_message(msg)
+    
+    #TODO descriptions
+    @app_commands.command(name='seteventdata')
+    async def set_guild(self, interaction:Interaction, event_channel:Optional[TextChannel], info_msg:Optional[str], 
+                        inv_msg:Optional[str], caravan_msg:Optional[str], notes_msg:Optional[str], caravan_sslots:Optional[int], 
+                        caravan_mslots:Optional[int], caravan_lslots:Optional[int], imprint_bonus:Optional[int]):
+        '''Set the event data'''
+        if event_channel: event_channel = str(event_channel.id)
+        await interaction.response.defer()
+        try:
+            if not(str(interaction.guild_id) in self.bot.guildData):
+                if not await db.register_guild(self.bot.dbPool, str(interaction.guild_id)):
+                    await interaction.followup.send('Error: Failed to register server info')
+                    return
+            result = await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), event_channel, info_msg, inv_msg, caravan_msg, 
+                                            notes_msg, caravan_sslots, caravan_mslots, caravan_lslots, imprint_bonus)
+            msg = ''
+            if(result):
+                if(result[-1] == '0'): msg = f'Nothing updated'
+                else: 
+                    msg = f'Event info updated'
+                    await self.bot.load_guilds()
+            else: msg = f'Error: Failed to update event info'
+            await interaction.followup.send(msg)
+        except Exception as e:
+            print(e)
+        
     @app_commands.command(name='regdino')
     @app_commands.describe(type='The dino to add')
     async def register_dino(self, interaction: Interaction, type: str):

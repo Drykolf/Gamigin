@@ -3,8 +3,8 @@
 /.env
 /venv
 /cogs/__pycache__
-/utils/__pycache__
-/queries/__pycache__
+/cogs/queries/__pycache__
 /data/__pycache__
-/queries/rpg/__pycache__
 /schemas/__pycache__
+/cogs/utils/__pycache__
+/tools/__pycache__

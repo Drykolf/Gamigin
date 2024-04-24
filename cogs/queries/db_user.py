@@ -1,4 +1,35 @@
 
+async def add_note(pool, user_id: str, note: str) -> bool:
+    async with pool.acquire() as connection:
+        query = '''INSERT INTO PlayerNotes (user_id, note) VALUES ($1, $2)'''
+        try:
+            await connection.execute(query, user_id, note)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+async def delete_note(pool, id:int) -> str:
+    async with pool.acquire() as connection:
+        query = '''DELETE FROM PlayerNotes WHERE id = $1 RETURNING *'''
+        try:
+            result = await connection.execute(query, id)
+            return result
+        except Exception as e:
+            print(e)
+            return None
+
+async def get_notes(pool) -> list:
+    async with pool.acquire() as connection:
+        query = '''SELECT id, note FROM PlayerNotes'''
+        try:
+            rows = await connection.fetch(query)
+            data = [list(row.values()) for row in rows]
+        except Exception as e:
+            print(e)
+            data = None
+        return data
+    
 async def get_dinos(pool) -> list:
     async with pool.acquire() as connection:
         try:

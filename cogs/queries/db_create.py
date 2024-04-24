@@ -1,9 +1,23 @@
-'''CREATE TABLES FOR DINOS AND PLAYERS'''
-async def create_dino_datatable(pool) -> None:
-    #informative
-    #regdino, admin
-    # deldino, admin
-    # viewdinos
+'''CREATE TABLES FOR RPG EVENT'''
+async def create_eventinfo(pool) -> None:
+    async with pool.acquire() as connection:
+        await connection.execute('''
+                    CREATE TABLE IF NOT EXISTS EventData (
+                        id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+                        guild_id varchar(50) NOT NULL UNIQUE,
+                        event_chnel_id varchar(50),
+                        info_msg_id varchar(50),
+                        inv_msg_id varchar(50),
+                        caravan_msg_id varchar(50),
+                        notes_msg_id varchar(50),
+                        caravan_sslots int NOT NULL DEFAULT 0,
+                        caravan_mslots int NOT NULL DEFAULT 0,
+                        caravan_lslots int NOT NULL DEFAULT 0,
+                        imprint_bonus int NOT NULL DEFAULT 0,
+                        PRIMARY KEY (id)
+                    )''')
+
+async def create_dino(pool) -> None:
         async with pool.acquire() as connection:
             await connection.execute('''
                     CREATE TABLE IF NOT EXISTS Dinos(
@@ -13,11 +27,7 @@ async def create_dino_datatable(pool) -> None:
                     )''')
 
 
-async def create_dino_classifications_datatable(pool) -> None:
-    #informative
-    #regclass, admin
-    # delclass, admin
-    # viewclasses
+async def create_dino_classifications(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS DinoClassifications (
@@ -29,11 +39,7 @@ async def create_dino_classifications_datatable(pool) -> None:
                 )
             ''')
 
-async def create_dino_capacities_datatable(pool) -> None:
-    #informative
-    #regcap, admin
-    # delcap, admin
-    # viewcaps
+async def create_dino_capacities(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS DinoCapacities (
@@ -44,11 +50,7 @@ async def create_dino_capacities_datatable(pool) -> None:
                 )
             ''')
 
-async def create_shiny_essences_datatable(pool) -> None:
-    #informative
-    #regess, admin
-    # deless, admin
-    #viewessences
+async def create_shiny_essences(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS ShinyEssences (
@@ -60,11 +62,7 @@ async def create_shiny_essences_datatable(pool) -> None:
                 )
             ''')
         
-async def create_abilityrolls_datatable(pool) -> None:
-    #informative
-    #regability, admin
-    #delability, admin
-    #viewabilities
+async def create_abilityrolls(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS AbilityRolls (
@@ -74,29 +72,8 @@ async def create_abilityrolls_datatable(pool) -> None:
                     PRIMARY KEY (id)
                 )
             ''')
-
-#deprecated      
-async def create_abilityrolls_bonuses_datatable(pool) -> None:
-    #regbonus $user $ability $bonus:int, admin
-    #delbonus, admin
-    async with pool.acquire() as connection:
-        await connection.execute('''
-                CREATE TABLE IF NOT EXISTS AbilityRollsBonuses (
-                    id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-                    user_id varchar(50) NOT NULL,
-                    ability varchar(50) NOT NULL,
-                    bonus int NOT NULL DEFAULT 1,
-                    description text,
-                    PRIMARY KEY (id)
-                )
-            ''')
         
-async def create_player_dino_datatable(pool) -> None:
-    #regplayer, admin (will add capacities and classifications)
-    #regplayer $user
-    # delplayer, admin
-    #edtplayer, admin
-    # players, player $user
+async def create_player_dino(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS PlayerDino (
@@ -119,9 +96,7 @@ async def create_player_dino_datatable(pool) -> None:
                 )
             ''')
 
-async def create_player_dino_classifications_datatable(pool) -> None:
-    #addplayerclass, admin
-    #delplayerclass, admin
+async def create_player_dino_classifications(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS PlayerDinoClassifications (
@@ -132,9 +107,7 @@ async def create_player_dino_classifications_datatable(pool) -> None:
                 )
             ''')
         
-async def create_player_dino_capacities_datatable(pool) -> None:
-    #addplayercap, admin
-    #delplayercap, admin
+async def create_player_dino_capacities(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
                 CREATE TABLE IF NOT EXISTS PlayerDinoCapacities (
@@ -145,7 +118,7 @@ async def create_player_dino_capacities_datatable(pool) -> None:
                 )
             ''')
 
-async def create_player_bonuses_table(pool) -> None:
+async def create_player_bonuses(pool) -> None:
     async with pool.acquire() as connection:
         await connection.execute('''
             CREATE TABLE IF NOT EXISTS PlayerBonus (
@@ -185,6 +158,29 @@ async def create_group_inventory(pool) -> None:
                 item_quantity int NOT NULL DEFAULT 1,
                 item_class varchar(50) NOT NULL DEFAULT 'Generic items',
                 item_category varchar(50) NOT NULL DEFAULT 'Generic material',
+                PRIMARY KEY (id)
+                )
+            ''')
+
+async def create_player_notes(pool) -> None:
+    async with pool.acquire() as connection:
+        await connection.execute('''
+            CREATE TABLE IF NOT EXISTS PlayerNotes (
+                id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+                user_id varchar(50) NOT NULL,
+                note text NOT NULL DEFAULT 'Blank',
+                PRIMARY KEY (id)
+                )
+            ''')
+
+async def create_caravan(pool) -> None:
+    async with pool.acquire() as connection:
+        await connection.execute('''
+            CREATE TABLE IF NOT EXISTS Caravan (
+                id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+                dino_type varchar(50) NOT NULL,
+                dino_name varchar(50),
+                dino_size int NOT NULL DEFAULT 1,
                 PRIMARY KEY (id)
                 )
             ''')

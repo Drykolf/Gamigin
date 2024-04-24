@@ -1,4 +1,79 @@
-'''INSERT INTO TABLES'''
+'''ADMIN ONLY QUERIES'''
+async def get_guilds_data(pool) -> list:
+    async with pool.acquire() as connection:
+        query = '''SELECT * FROM EventData'''
+        try:
+            rows = await connection.fetch(query)
+            data = [dict(row.items()) for row in rows]
+        except Exception as e:
+            print(e)
+            data = None
+        return data
+
+async def get_guild_info(pool, guildId:str) -> dict:
+    async with pool.acquire() as connection:
+        query = '''SELECT * FROM EventData WHERE guild_id = $1'''
+        try:
+            row = await connection.fetchrow(query, guildId)
+            if row:data = dict(row.items())
+            else: data = {}
+        except Exception as e:
+            print(e)
+            data = None
+        return data
+    
+async def register_guild(pool, guildId:str) -> bool:
+    async with pool.acquire() as connection:
+        query = '''INSERT INTO EventData (guild_id) VALUES ($1) ON CONFLICT DO NOTHING'''
+        try:
+            await connection.execute(query, guildId)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+        
+async def set_guild_data(pool, guildId:str, event_channel:str=None, info_msg_id:str=None, inv_msg_id:str=None, caravan_msg_id:str=None, notes_msg_id:str=None, 
+                         caravan_sslots:int=None, caravan_mslots:int=None, caravan_lslots:int=None, imprint_bonus:int=None) -> str:
+    async with pool.acquire() as connection:
+        query = 'UPDATE EventData SET '
+        update = False
+        if event_channel: 
+            query += f"event_chnel_id = '{event_channel}'," 
+            update=True
+        if info_msg_id:
+            query += f"info_msg_id = '{info_msg_id}',"
+            update=True
+        if inv_msg_id:
+            query += f"inv_msg_id = '{inv_msg_id}',"
+            update=True
+        if caravan_msg_id:
+            query += f"caravan_msg_id = '{caravan_msg_id}',"
+            update=True
+        if notes_msg_id:
+            query += f"notes_msg_id = '{notes_msg_id}',"
+            update=True
+        if caravan_sslots:
+            query += f"caravan_sslots = {caravan_sslots},"
+            update=True
+        if caravan_mslots:
+            query += f"caravan_mslots = {caravan_mslots},"
+            update=True
+        if caravan_lslots:
+            query += f"caravan_lslots = {caravan_lslots},"
+            update=True
+        if imprint_bonus:
+            query += f"imprint_bonus = {imprint_bonus},"
+            update=True
+        if update:
+            query = query[:-1] + f" WHERE guild_id = $1 RETURNING *"
+            try:
+                result = await connection.execute(query, guildId)
+                return result
+            except Exception as e:
+                print(e)
+                return None
+        else:
+            return '0'
 
 async def register_dino_type(pool, dino_type:str) -> bool:
     async with pool.acquire() as connection:

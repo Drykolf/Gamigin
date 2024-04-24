@@ -3,8 +3,8 @@ import os
 from typing import List
 import asyncpg
 from discord import Intents
-import utils.settings as settings
-from utils.bot import Zury
+import tools.settings as settings
+from tools.bot import Zury
 
 def get_intents() -> Intents:
     intents: Intents = Intents.default()
