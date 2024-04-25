@@ -1,4 +1,5 @@
 from re import search
+from tkinter import E
 from typing import Optional
 from discord.ext import commands
 from discord import Embed, Interaction, Member, NotFound, app_commands, TextChannel
@@ -29,6 +30,7 @@ class RPG_Admin(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('RPG config cog is ready!')
+        
     def formatInventory(self, items):
         embedMsg = Embed(title='Group Inventory', description='Everything the group has collected:')
         itemClasses = []
@@ -56,13 +58,14 @@ class RPG_Admin(commands.Cog):
     async def update_items_msg(self,interaction: Interaction) -> None:
         if (str(interaction.guild_id) in self.bot.guildData):
             data = self.bot.guildData[str(str(interaction.guild_id))]
-            if (data['event_chnel_id']!=None):
+            if (data['event_chnel_id']!=None and data['event_chnel_id'] != '0'):
                 channel = interaction.guild.get_channel(int(data['event_chnel_id']))
                 match data['inv_msg_id']:
                     case None: return
                     case '0': return
                     case '1': 
-                        msg = await channel.send('Inventory: ')
+                        msg = await channel.send(embed=Embed(title='===The Group Event Inventory===', 
+                                                             description='Everyone has access to this inventory during the event regardless of location'))
                         await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), inv_msg_id=str(msg.id))
                         data['inv_msg_id'] = str(msg.id)
                         await self.bot.load_guilds()
@@ -70,15 +73,82 @@ class RPG_Admin(commands.Cog):
                     itemsMsg = channel.get_partial_message(int(data['inv_msg_id']))
                     if (items := await db.get_items(self.bot.dbPool)) is not None:
                         invContent = self.formatInventory(items)
-                        await itemsMsg.edit(content='===The Group Event Inventory===',embed=invContent)
+                        await itemsMsg.edit(embed=invContent)
                 except NotFound as e:
                     await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), inv_msg_id='0')
                     data['inv_msg_id'] = '0'
                     await self.bot.load_guilds()
                 except Exception as e:
-                    print(f'update msg error: {e}')
+                    print(f'update item msg error: {e}')
                     #log error
-                  
+    
+    async def update_caravan_msg(self,interaction: Interaction) -> None:
+        if (str(interaction.guild_id) in self.bot.guildData):
+            data = self.bot.guildData[str(str(interaction.guild_id))]
+            if (data['event_chnel_id']!=None and data['event_chnel_id'] != '0'):
+                channel = interaction.guild.get_channel(int(data['event_chnel_id']))
+                match data['caravan_msg_id']:
+                    case None: return
+                    case '0': return
+                    case '1': 
+                        msg = await channel.send(embed=Embed(title='Caravan Information', description='Campaign related caravan information:'))
+                        await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), caravan_msg_id=str(msg.id))
+                        data['caravan_msg_id'] = str(msg.id)
+                        await self.bot.load_guilds()
+                sDinos = 0
+                mDinos = 0
+                lDinos = 0
+                result = None
+                try:
+                    result = await db.get_caravan(self.bot.dbPool)
+                except Exception as e:
+                    print(f'fetch caravan msg error: {e}')
+                    #log error
+                if result:
+                    for dino in result:
+                        if dino[2] == 1: sDinos += 1
+                        if dino[2] == 2: mDinos += 1
+                        if dino[2] == 3: lDinos += 1
+                msg = Embed()
+                content = f'Little Dinos: {sDinos}/{data["caravan_sslots"]} \n Medium Dinos: {mDinos}/{data["caravan_mslots"]} \n Large Dinos: {lDinos}/{data["caravan_lslots"]}'
+                msg.add_field(name='Caravan Capacity', value=content)
+                try:
+                    caravanMsg = channel.get_partial_message(int(data['caravan_msg_id']))
+                    await caravanMsg.edit(embed=msg)
+                except NotFound as e:
+                    await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), caravan_msg_id='0')
+                    data['caravan_msg_id'] = '0'
+                    await self.bot.load_guilds()
+                except Exception as e:
+                    print(f'update caravan msg error: {e}')
+                    #log error
+                    
+    async def update_info_msg(self,interaction: Interaction) -> None:
+        if (str(interaction.guild_id) in self.bot.guildData):
+            data = self.bot.guildData[str(str(interaction.guild_id))]
+            if (data['event_chnel_id']!=None and data['event_chnel_id'] != '0'):
+                channel = interaction.guild.get_channel(int(data['event_chnel_id']))
+                match data['info_msg_id']:
+                    case None: return
+                    case '0': return
+                    case '1': 
+                        msg = await channel.send(embed=Embed(title='Event Information', description='Campaign related basic information:'))
+                        await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), info_msg_id=str(msg.id))
+                        data['info_msg_id'] = str(msg.id)
+                        await self.bot.load_guilds()
+                try:
+                    infoMsg = channel.get_partial_message(int(data['info_msg_id']))
+                    msg = Embed(title='Event Information', description='Campaign related basic information:')
+                    msg.add_field(name='', value=f'**Imprinting Bonus:** {data["imprint_bonus"]}%')
+                    await infoMsg.edit(embed=msg)
+                except NotFound as e:
+                    await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), info_msg_id='0')
+                    data['info_msg_id'] = '0'
+                    await self.bot.load_guilds()
+                except Exception as e:
+                    print(f'update info msg error: {e}')
+                    #log error
+                    
     @commands.command()
     async def testadmin(self, ctx, *args):
         '''This is a test command'''
@@ -118,6 +188,8 @@ class RPG_Admin(commands.Cog):
                 else: 
                     msg = f'Event info updated'
                     await self.bot.load_guilds()
+                    if(info_msg is not None or imprint_bonus is not None): await self.update_info_msg(interaction)
+                    if(caravan_msg is not None or caravan_sslots is not None or caravan_mslots is not None or caravan_lslots is not None): await self.update_caravan_msg(interaction)
             else: msg = f'Error: Failed to update event info'
             await interaction.followup.send(msg)
         except Exception as e:
@@ -272,9 +344,14 @@ class RPG_Admin(commands.Cog):
                          companionship_lvl:Optional[int], saddle_mastery: Optional[int], dino_companionship: Optional[int],
                          capacity: Optional[int], studious_mastery: Optional[int]):
         '''Updates informations for the selected player (needs to be already registered)'''
-        result = await db.update_player_data(self.bot.dbPool, str(player.id), dino_type.capitalize(), dino_name.capitalize(), dino_status.capitalize(), dino_personality.capitalize(),
-                                     dino_essence.capitalize(), dino_imprinting, dino_relationship, companionship_lvl, saddle_mastery,
-                                     dino_companionship, capacity, studious_mastery)
+        if dino_type: dino_type = dino_type.capitalize()
+        if dino_name: dino_name = dino_name.capitalize()
+        if dino_status: dino_status = dino_status.capitalize()
+        if dino_personality: dino_personality = dino_personality.capitalize()
+        if dino_essence: dino_essence = dino_essence.capitalize()
+        result = await db.update_player_data(self.bot.dbPool, str(player.id), dino_type, dino_name, dino_status, dino_personality,
+                                    dino_essence, dino_imprinting, dino_relationship, companionship_lvl, saddle_mastery,
+                                    dino_companionship, capacity, studious_mastery)
         msg = ''
         if(result):
             if(result[-1] == '0'): msg = f'Error: {player.display_name} not updated/not found'
@@ -441,6 +518,25 @@ class RPG_Admin(commands.Cog):
                 msg = f'{item} deleted'
         else: msg = f'Error: Failed to delete {item}'
         await interaction.followup.send(msg)
+        
+    #TODO autocomplete dinoTpe
+    @app_commands.command(name='addcaravan')
+    @app_commands.describe(dino_type='The dino to add to the caravan')
+    @app_commands.describe(dino_name='The dino name')
+    @app_commands.describe(dino_size='The dino size')
+    @app_commands.choices(dino_size=[
+        app_commands.Choice(name='Small', value=1), 
+        app_commands.Choice(name='Medium', value=2), 
+        app_commands.Choice(name='Large', value=3),
+        app_commands.Choice(name='Platform', value=0)])
+    async def add_caravan(self, interaction: Interaction, dino_type: str, dino_size: int, dino_name: Optional[str]=None):
+        '''Add a dino to the caravan'''
+        if(dino_name): dino_name = dino_name.capitalize()
+        if await db.add_caravan_dino(self.bot.dbPool, dino_type.capitalize(), dino_name, dino_size):
+            await interaction.response.send_message(f'accepted')
+            await self.update_caravan_msg(interaction)
+        else:
+            await interaction.response.send_message(f'Error: Failed to add {dino_type} to the caravan')
     
 async def setup(bot):
     await bot.add_cog(RPG_Admin(bot))

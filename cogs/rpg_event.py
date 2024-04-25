@@ -24,21 +24,24 @@ class RPG_Event(commands.Cog):
     async def update_notes_msg(self,ctx:Context) -> None:
         if (str(ctx.guild.id) in self.bot.guildData):
             data = self.bot.guildData[str(ctx.guild.id)]
-            if (data['event_chnel_id']!=None):
+            if (data['event_chnel_id']!=None and data['event_chnel_id'] != '0'):
                 channel = ctx.guild.get_channel(int(data['event_chnel_id']))
                 match data['notes_msg_id']:
                     case None: return
                     case '0': return
                     case '1': 
-                        msg = await channel.send('Notes: ')
+                        msg = await channel.send(content='No notes added yet...')
                         await set_guild_data(self.bot.dbPool, str(ctx.guild.id), notes_msg_id=str(msg.id))
                         data['notes_msg_id'] = str(msg.id)
                         await self.bot.load_guilds()
                 try:
                     notesMsg = channel.get_partial_message(int(data['notes_msg_id']))
                     if (notes := await rpgDb.get_notes(self.bot.dbPool)) is not None:
-                        notesContent = 'Notes: \n' + '\n'.join([f'{note[0]}: {note[1]}' for note in notes])
+                        notesContent = '\n'.join([f'{note[0]}: {note[1]}' for note in notes])
+                        notesContent = '**Notes:** \n'+notesContent
                         await notesMsg.edit(content=notesContent)
+                    else:
+                        await notesMsg.edit(content='No notes added yet...')
                 except NotFound as e:
                     await set_guild_data(self.bot.dbPool, str(ctx.guild.id), notes_msg_id='0')
                     data['notes_msg_id'] = '0'

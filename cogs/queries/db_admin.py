@@ -301,7 +301,7 @@ async def update_player_data(pool, player_id:str, dino_type:str, dino_name:str, 
             update=True
         if update:
             query = query[:-1] + f" WHERE user_id = $1 RETURNING *"
-            print(query)
+            #print(query)
             try:
                 result = await connection.execute(query, player_id)
                 print(result)
@@ -434,3 +434,24 @@ async def delete_item(pool, item_name:str) -> str:
         except Exception as e:
             print(e)
             return None
+
+async def get_caravan(pool) -> list:
+    async with pool.acquire() as connection:
+        query = '''SELECT * FROM Caravan'''
+        try:
+            rows = await connection.fetch(query)
+            data = [list(row.values())[1:] for row in rows]
+        except Exception as e:
+            print(e)
+            data = None
+        return data
+
+async def add_caravan_dino(pool, dinoType:str, dinoName:str, dinoSize:int) -> bool:
+    async with pool.acquire() as connection:
+        query = '''INSERT INTO Caravan (dino_type, dino_name, dino_size) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING'''
+        try:
+            await connection.execute(query, dinoType, dinoName, dinoSize)
+            return True
+        except Exception as e:
+            print(e)
+            return False
