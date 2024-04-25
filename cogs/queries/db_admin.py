@@ -278,25 +278,25 @@ async def update_player_data(pool, player_id:str, dino_type:str, dino_name:str, 
         if dino_shiny_essence: 
             query += f"dino_shiny_essence = '{dino_shiny_essence}',"
             update=True
-        if dino_imprinting: 
+        if dino_imprinting is not None: 
             query += f"dino_imprinting = {dino_imprinting},"
             update=True
-        if dino_relationship: 
+        if dino_relationship is not None: 
             query += f"dino_relationship = {dino_relationship},"
             update=True
-        if companionship_lvl: 
+        if companionship_lvl is not None: 
             query += f"companionship_lvl = {companionship_lvl},"
             update=True
-        if saddle_mastery: 
+        if saddle_mastery is not None: 
             query += f"saddle_mastery = {saddle_mastery},"
             update=True
-        if dino_companionship: 
+        if dino_companionship is not None: 
             query += f"dino_companionship = {dino_companionship},"
             update=True
-        if capacity: 
+        if capacity is not None: 
             query += f"capacity = {capacity},"
             update=True
-        if studious_mastery: 
+        if studious_mastery is not None: 
             query += f"studious_mastery = {studious_mastery},"
             update=True
         if update:
@@ -309,6 +309,8 @@ async def update_player_data(pool, player_id:str, dino_type:str, dino_name:str, 
             except Exception as e:
                 print(e)
                 return None
+        else:
+            return '0'
             
 async def delete_player(pool, player_id:str) -> str:
     async with pool.acquire() as connection:
@@ -375,51 +377,60 @@ async def set_player_bonus_roll(pool, user_id:str, ability:str, bonus:int,operat
         except Exception as e:
             print(e)
             return False
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 '''Group item inventory'''
-async def set_item(pool, item_name, item_class=None, item_cat=None, item_quantity= None) -> None:
+async def set_item(pool, item_name:str, item_class:str=None, item_cat:str=None, item_quantity:int= None, operator:str=None) -> str:
     async with pool.acquire() as connection:
-        await connection.execute('''
-                            INSERT INTO GroupInventory(item_name)
-                            VALUES ($1) ON CONFLICT DO NOTHING''', item_name)
-        query = ''
+        try:
+            await connection.execute('''
+                                INSERT INTO GroupInventory(item_name)
+                                VALUES ($1) ON CONFLICT DO NOTHING''', item_name)
+        except Exception as e:
+            print(f'Error insert item: {e}')
+            return None
+        query = 'UPDATE GroupInventory SET '
         update = False
         if(item_class):
-            query += f'item_class = {item_class},'
+            query += f"item_class = '{item_class}',"
             update = True
         if(item_cat):
-            query += f'item_category = {item_cat},'
+            query += f"item_category = '{item_cat}',"
             update = True
-        if(item_quantity):
-            query += f'item_quantity = {item_quantity},'
+        if(item_quantity is not None):
+            if operator:
+                query += f"item_quantity = item_quantity {operator} {item_quantity},"
+            else:
+                query += f"item_quantity = {item_quantity},"
             update = True
-        if update: await connection.execute('''UPDATE GroupInventory SET '''+query[:-1])
+        if update:
+            query = query[:-1] + f" WHERE item_name = $1 RETURNING *"
+            #print(query)
+            try:
+                result = await connection.execute(query, item_name)
+                return result
+            except Exception as e:
+                print(f'set item {e}')
+                return None
+        else:
+            return '0'
         
+async def get_items(pool) -> list:
+    async with pool.acquire() as connection:
+        query = '''SELECT * FROM GroupInventory'''
+        try:
+            rows = await connection.fetch(query)
+            data = [list(row.values()) for row in rows]
+        except Exception as e:
+            print(e)
+            data = None
+        return data
+    
+async def delete_item(pool, item_name:str) -> str:
+    async with pool.acquire() as connection:
+        query = '''DELETE FROM GroupInventory WHERE item_name = $1 RETURNING *'''
+        try:
+            result = await connection.execute(query, item_name)
+            return result
+        except Exception as e:
+            print(e)
+            return None

@@ -1,7 +1,7 @@
 from re import search
 from typing import Optional
 from discord.ext import commands
-from discord import Interaction, Member, app_commands, TextChannel, Message
+from discord import Embed, Interaction, Member, NotFound, app_commands, TextChannel
 import cogs.queries.db_admin as db
 from cogs.queries.db_user import get_ability_rolls, get_player_info
 
@@ -29,7 +29,56 @@ class RPG_Admin(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('RPG config cog is ready!')
+    def formatInventory(self, items):
+        embedMsg = Embed(title='Group Inventory', description='Everything the group has collected:')
+        itemClasses = []
+        for item in items:
+            if item[3] not in itemClasses:
+                itemClasses.append(item[3])
+        for clas in itemClasses:
+            itemCategories = []
+            content = ''
+            embedMsg.add_field(name=clas.upper(), value='\u200b', inline=True)
+            for item in items:
+                if item[3] == clas:
+                    if item[4] not in itemCategories:
+                        itemCategories.append(item[4])
+            for cat in itemCategories:
+                content += f'**{cat}**\n'
+                for item in items:
+                    if item[3] == clas and item[4] == cat:
+                        content += f'{item[1]}: x{item[2]}\n'
+            embedMsg.add_field(name='\u200b',value=content, inline=True)
+            embedMsg.add_field(name='\u200b', value='\u200b', inline=True)
         
+        return embedMsg
+    
+    async def update_items_msg(self,interaction: Interaction) -> None:
+        if (str(interaction.guild_id) in self.bot.guildData):
+            data = self.bot.guildData[str(str(interaction.guild_id))]
+            if (data['event_chnel_id']!=None):
+                channel = interaction.guild.get_channel(int(data['event_chnel_id']))
+                match data['inv_msg_id']:
+                    case None: return
+                    case '0': return
+                    case '1': 
+                        msg = await channel.send('Inventory: ')
+                        await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), inv_msg_id=str(msg.id))
+                        data['inv_msg_id'] = str(msg.id)
+                        await self.bot.load_guilds()
+                try:
+                    itemsMsg = channel.get_partial_message(int(data['inv_msg_id']))
+                    if (items := await db.get_items(self.bot.dbPool)) is not None:
+                        invContent = self.formatInventory(items)
+                        await itemsMsg.edit(content='===The Group Event Inventory===',embed=invContent)
+                except NotFound as e:
+                    await db.set_guild_data(self.bot.dbPool, str(interaction.guild_id), inv_msg_id='0')
+                    data['inv_msg_id'] = '0'
+                    await self.bot.load_guilds()
+                except Exception as e:
+                    print(f'update msg error: {e}')
+                    #log error
+                  
     @commands.command()
     async def testadmin(self, ctx, *args):
         '''This is a test command'''
@@ -228,7 +277,7 @@ class RPG_Admin(commands.Cog):
                                      dino_companionship, capacity, studious_mastery)
         msg = ''
         if(result):
-            if(result[-1] == '0'): msg = f'Error: {player.display_name} not found'
+            if(result[-1] == '0'): msg = f'Error: {player.display_name} not updated/not found'
             else: msg = f'{player.display_name} updated'
         else: msg = f'Error: Failed to update {player.display_name}'
         await interaction.response.send_message(msg)
@@ -245,6 +294,7 @@ class RPG_Admin(commands.Cog):
         else: msg = f'Error: Failed to delete {player.display_name}'
         await interaction.response.send_message(msg)
     
+    #TODO autocomplete
     @app_commands.command(name='addplayerclass')
     @app_commands.describe(player='The player set the data for')
     @app_commands.describe(clas='The classification to add')
@@ -276,7 +326,8 @@ class RPG_Admin(commands.Cog):
             else: msg = f'{clas} deleted'
         else: msg = f'Error: Failed to delete {clas}'
         await interaction.response.send_message(msg)
-        
+    
+    #TODO autocomplete
     @app_commands.command(name='addplayercap')
     @app_commands.describe(player='The player to add the capacity to')
     @app_commands.describe(capacity='The capacity to add')
@@ -307,6 +358,7 @@ class RPG_Admin(commands.Cog):
         else: msg = f'Error: Failed to delete {capacity}'
         await interaction.response.send_message(msg)
     
+    #TODO autocomplete
     @app_commands.command(name='setbonus')
     @app_commands.describe(player='The player to add the bonus to')
     @app_commands.describe(ability='The ability to update')
@@ -341,10 +393,54 @@ class RPG_Admin(commands.Cog):
         # Then return a list of app_commands.Choice
         return search_results
     
-    
-    
-    #todo setitem
-    
+    #TODO autocomplete
+    @app_commands.command(name='setitem')
+    @app_commands.describe(item='The item to add or update')
+    async def set_item(self, interaction: Interaction, item: str, item_class:Optional[str], item_cat:Optional[str], item_quantity:Optional[str]):
+        '''Registers or edits an item for the event'''
+        await interaction.response.defer()
+        op = None
+        if item_quantity:
+            if(item_quantity[0] == '+' or item_quantity[0] == '-'):
+                op = item_quantity[0]
+                item_quantity=item_quantity[1:]
+            try:item_quantity = int(item_quantity)
+            except:
+                await interaction.response.send_message(f'Invalid quantity value')
+                return
+        if item: item = item.capitalize()
+        if item_class: item_class = item_class.capitalize()
+        if item_cat: item_cat = item_cat.capitalize()
+        try: 
+            result = await db.set_item(self.bot.dbPool, item, item_class, item_cat, item_quantity, op)
+            msg = ''
+            if result: 
+                if(result[-1] == '0'): 
+                    msg = f'Item {item} added if didnt existed, no changes made'
+                    await self.update_items_msg(interaction)
+                else: 
+                    msg = f'Item {item} updated'
+                    await self.update_items_msg(interaction)
+            else: msg = f'Error: Failed to set {item} item'
+            await interaction.followup.send(msg)
+        except Exception as e:
+            print(e)
+        
+    #TODO autocomplete?
+    @app_commands.command(name='delitem')
+    @app_commands.describe(item='The item to delete')
+    async def delete_item(self, interaction: Interaction, item: str):
+        '''Delete item'''
+        await interaction.response.defer()
+        result = await db.delete_item(self.bot.dbPool, item.capitalize())
+        msg = ''
+        if(result):
+            if(result[-1] == '0'): msg = f'Error: {item} not found'
+            else: 
+                await self.update_items_msg(interaction)
+                msg = f'{item} deleted'
+        else: msg = f'Error: Failed to delete {item}'
+        await interaction.followup.send(msg)
     
 async def setup(bot):
     await bot.add_cog(RPG_Admin(bot))
