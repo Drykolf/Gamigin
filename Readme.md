@@ -44,9 +44,12 @@ At the moment, it consist only of 2 functions, when any is used, a pinned messag
 | /addnote,?n   |     both     |   any |
 | /delnote, ?dn |     both     |   any |
 
-- add note
-  Adds a note, I implemented the prefix use ?n, so its pretty easy and quick to add a note by just typing ?n this is a note
-- del note
+- addnote
+
+  Adds a note, I implemented the prefix use ?n, so its pretty easy and quick to add a note by just typing: ?n this is a note
+
+- delnote
+
   Removes a note, it uses an id to delete a note, so it would be ?dn 2.
 
 ###### TODO: implement a command that retrieves and shows the list of currently added notes. Also add the possibility to add tags to each note, so they can be filtered on search.
@@ -61,13 +64,16 @@ The inventory system, allows to manage the items found by the group during the e
 | /delitem |    slash     | admin |
 
 - setitem
-  ⋅⋅ With this command, an item can be added or updated, for an item to be added only needs the name, so the command can be called using /setitem Sun berry
-  For the same item to be updated, it needs to write the same name, plus any aditional data to be updated: /setitem "Sun berry" "Raw Plants"
-  Required arguments: Item Name
+
+  With this command, an item can be added or updated, for an item to be added only needs the name, so the command can be called using /setitem Sun berry  
+  For the same item to be updated, it needs to write the same name, plus any aditional data to be updated: /setitem "Sun berry" "Raw Plants"  
+  Required arguments: Item Name  
   Optional arguments: Item class, item category, item quantity
+
 - delitem
-  ⋅⋅ Removes an item from the inventory, by calling its name
-  Example: /delitem 'Sun berry'
+
+  Removes an item from the inventory, by calling its name  
+  Example: /delitem 'Sun berry'  
   Required arguments: item name
 
 ###### TODO:Implement recipes
@@ -91,6 +97,7 @@ Player information, this is where each player can be registered, updated, or del
 | /bonus, ?b      |     both     |   any |
 
 - addplayer
+
   This one registers a player as a participant for the event. A player must be registered before updating any information from him/her.  
   Example: /addplayer Drykolf 'Phoenix' 'Yela'  
   Required arguments: Player, Chosen dino (choices), Dino name  
@@ -104,44 +111,63 @@ Player information, this is where each player can be registered, updated, or del
   Optional arguments: dino_type (choices), dino_name, dino_status (alive?), dino_personality(Unknown by default), dino_essence (shiny essence, choices), dino_imprinting, dino_relationship(happy?, choices?), companionship_lvl, saddle_mastery, dino_companionship, capacity_lvl, studious_mastery
 
 - delplayer
+
   Removes the player information from the bot tables.  
   Example: /delplayer Drykolf  
   Required arguments: Player
+
 - player
-  ⋅⋅⋅This command displays a card with the information regarding the player. Can be own information, or another player's
-  ⋅⋅⋅Example: ?pl
-  ⋅⋅⋅Optional arguments: Player
+
+  This command displays a card with the information regarding the player. Can be own information, or another player's  
+  Example: ?pl  
+  Optional arguments: Player
+
 - players
-  ⋅⋅⋅Shows a list of the players registered for the event
-  ⋅⋅⋅Example: ?players
+
+  Shows a list of the players registered for the event
+  Example: ?players
+
 - bonus
-  ⋅⋅⋅Shows the bonus that a player has for any ability roll
-  ⋅⋅⋅Example: ?b tek -> would show any bonus tek related, if no arguments, will show any bonus that has any points on
-  ⋅⋅⋅Optional arguments: any word works as a search
+
+  Shows the bonus that a player has for any ability roll  
+  Example: ?b tek -> would show any bonus tek related, if no arguments, will show any bonus that has any points on
+  Optional arguments: any word works as a search
+
 - addplayerclass
-  ⋅⋅⋅Adds a classification to the player
-  ⋅⋅⋅Example: /addplayerclass Drykolf Bird
-  ⋅⋅⋅Required arguments: Player, Classification (choices)
+
+  Adds a classification to the player
+  Example: /addplayerclass Drykolf Bird
+  Required arguments: Player, Classification (choices)
+
 - delplayerclass
-  ⋅⋅⋅Removes a classification from the player
-  ⋅⋅⋅Example: /delplayerclass Drykolf Bird
-  ⋅⋅⋅Required arguments: Player, Classification (choices)
+
+  Removes a classification from the player
+  Example: /delplayerclass Drykolf Bird
+  Required arguments: Player, Classification (choices)
+
 - addplayercap
-  ⋅⋅⋅Adds a capacity to the player
-  ⋅⋅⋅Example: /addplayercap Drykolf Execute
-  ⋅⋅⋅Required arguments: Player, Capacity (choices)
+
+  Adds a capacity to the player
+  Example: /addplayercap Drykolf Execute
+  Required arguments: Player, Capacity (choices)
+
 - addplayercap
-  ⋅⋅⋅Adds a capacity to the player
-  ⋅⋅⋅Example: /addplayercap Drykolf Execute
-  ⋅⋅⋅Required arguments: Player, Capacity (choices)
+
+  Adds a capacity to the player
+  Example: /addplayercap Drykolf Execute
+  Required arguments: Player, Capacity (choices)
+
 - delplayercap
-  ⋅⋅⋅Removes a capacity from the player
-  ⋅⋅⋅Example: /delplayercap Drykolf Execute
-  ⋅⋅⋅Required arguments: Player, Capacity (choices)
+
+  Removes a capacity from the player
+  Example: /delplayercap Drykolf Execute
+  Required arguments: Player, Capacity (choices)
+
 - setbonus
-  ⋅⋅⋅Updates bonuses from the player, the bonus can be a direct value (2), or an addition/subtraction over the old bonus (+3)
-  ⋅⋅⋅Example: /setbonus Drykolf Hunting +2
-  ⋅⋅⋅Required arguments: Player, ability (choices), bonus
+
+  Updates bonuses from the player, the bonus can be a direct value (2), or an addition/subtraction over the old bonus (+3)
+  Example: /setbonus Drykolf Hunting +2
+  Required arguments: Player, ability (choices), bonus
 
 ###### TODO:
 
