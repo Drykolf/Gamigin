@@ -17,7 +17,7 @@ There's a table where some special data is stored, general information for the b
 | /seteventdata |    slash     | admin |
 
 - geteventdata
-  ⋅⋅ Displays a message with the discord server event related information. This is mostly for testing purposes.
+  Displays a message with the discord server event related information. This is mostly for testing purposes.
   It shows:
   - server id
   - event-info channel id
@@ -28,9 +28,9 @@ There's a table where some special data is stored, general information for the b
   - notes msg id (this is where the notes will be shown)
   - imprint bonus (current group imprint bonus)
 - seteventdata
-  ⋅⋅ Updates the aforementioned information
-  Example: /seteventdata imprint_bonus:140
-  Required arguments: None
+  Updates the aforementioned information  
+  Example: /seteventdata imprint_bonus:140  
+  Required arguments: None  
   Optional arguments: all of the above
 
 ###### TODO:
@@ -45,9 +45,9 @@ At the moment, it consist only of 2 functions, when any is used, a pinned messag
 | /delnote, ?dn |     both     |   any |
 
 - add note
-  ⋅⋅ Adds a note, I implemented the prefix use ?n, so its pretty easy and quick to add a note by just typing ?n this is a note
+  Adds a note, I implemented the prefix use ?n, so its pretty easy and quick to add a note by just typing ?n this is a note
 - del note
-  ⋅⋅ Removes a note, it uses an id to delete a note, so it would be ?dn 2.
+  Removes a note, it uses an id to delete a note, so it would be ?dn 2.
 
 ###### TODO: implement a command that retrieves and shows the list of currently added notes. Also add the possibility to add tags to each note, so they can be filtered on search.
 
@@ -91,23 +91,22 @@ Player information, this is where each player can be registered, updated, or del
 | /bonus, ?b      |     both     |   any |
 
 - addplayer
-
-  ⋅⋅⋅This one registers a player as a participant for the event. A player must be registered before updating any information from him/her.⋅⋅
-  ⋅⋅⋅Example: /addplayer Drykolf 'Phoenix' 'Yela'⋅⋅
-  ⋅⋅⋅Required arguments: Player, Chosen dino (choices), Dino name⋅⋅
-  ⋅⋅⋅Optional arguments: None⋅⋅
+  This one registers a player as a participant for the event. A player must be registered before updating any information from him/her.  
+  Example: /addplayer Drykolf 'Phoenix' 'Yela'  
+  Required arguments: Player, Chosen dino (choices), Dino name  
+  Optional arguments: None
 
 - setplayer
 
   Updates a player information.  
   Example: /setplayer Drykolf  
   Required arguments: Player  
-  ⋅Optional arguments: dino_type (choices), dino_name, dino_status (alive?), dino_personality(Unknown by default), dino_essence (shiny essence, choices), dino_imprinting, dino_relationship(happy?, choices?), companionship_lvl, saddle_mastery, dino_companionship, capacity_lvl, studious_mastery
+  Optional arguments: dino_type (choices), dino_name, dino_status (alive?), dino_personality(Unknown by default), dino_essence (shiny essence, choices), dino_imprinting, dino_relationship(happy?, choices?), companionship_lvl, saddle_mastery, dino_companionship, capacity_lvl, studious_mastery
 
 - delplayer
-  ⋅⋅⋅Removes the player information from the bot tables.
-  ⋅⋅⋅Example: /delplayer Drykolf
-  ⋅⋅⋅Required arguments: Player
+  Removes the player information from the bot tables.  
+  Example: /delplayer Drykolf  
+  Required arguments: Player
 - player
   ⋅⋅⋅This command displays a card with the information regarding the player. Can be own information, or another player's
   ⋅⋅⋅Example: ?pl
