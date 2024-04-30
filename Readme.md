@@ -98,10 +98,12 @@ Player information, this is where each player can be registered, updated, or del
   ⋅⋅⋅Optional arguments: None⋅⋅
 
 - setplayer
-  ⋅⋅⋅Updates a player information.
-  ⋅⋅⋅Example: /setplayer Drykolf
-  ⋅⋅⋅Required arguments: Player
-  ⋅⋅⋅Optional arguments: dino_type (choices), dino_name, dino_status (alive?), dino_personality(Unknown by default), dino_essence (shiny essence, choices), dino_imprinting, dino_relationship(happy?, choices?), companionship_lvl, saddle_mastery, dino_companionship, capacity_lvl, studious_mastery
+
+  Updates a player information.  
+  Example: /setplayer Drykolf  
+  Required arguments: Player  
+  ⋅Optional arguments: dino_type (choices), dino_name, dino_status (alive?), dino_personality(Unknown by default), dino_essence (shiny essence, choices), dino_imprinting, dino_relationship(happy?, choices?), companionship_lvl, saddle_mastery, dino_companionship, capacity_lvl, studious_mastery
+
 - delplayer
   ⋅⋅⋅Removes the player information from the bot tables.
   ⋅⋅⋅Example: /delplayer Drykolf
