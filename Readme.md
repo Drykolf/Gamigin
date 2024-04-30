@@ -92,53 +92,53 @@ Player information, this is where each player can be registered, updated, or del
 
 - addplayer
   ⋅⋅This one registers a player as a participant for the event. A player must be registered before updating any information from him/her.
-  Example: /addplayer Drykolf 'Phoenix' 'Yela'
-  Required arguments: Player, Chosen dino (choices), Dino name
-  Optional arguments: None
+  ⋅⋅ Example: /addplayer Drykolf 'Phoenix' 'Yela'
+  ⋅⋅ Required arguments: Player, Chosen dino (choices), Dino name
+  ⋅⋅ Optional arguments: None
 - setplayer
   ⋅⋅ Updates a player information.
-  Example: /setplayer Drykolf
-  Required arguments: Player
-  Optional arguments: dino_type (choices), dino_name, dino_status (alive?), dino_personality(Unknown by default), dino_essence (shiny essence, choices), dino_imprinting, dino_relationship(happy?, choices?), companionship_lvl, saddle_mastery, dino_companionship, capacity_lvl, studious_mastery
+  ⋅⋅ Example: /setplayer Drykolf
+  ⋅⋅ Required arguments: Player
+  ⋅⋅ Optional arguments: dino_type (choices), dino_name, dino_status (alive?), dino_personality(Unknown by default), dino_essence (shiny essence, choices), dino_imprinting, dino_relationship(happy?, choices?), companionship_lvl, saddle_mastery, dino_companionship, capacity_lvl, studious_mastery
 - delplayer
   ⋅⋅ Removes the player information from the bot tables.
-  Example: /delplayer Drykolf
-  Required arguments: Player
+  ⋅⋅ Example: /delplayer Drykolf
+  ⋅⋅ Required arguments: Player
 - player
   ⋅⋅ This command displays a card with the information regarding the player. Can be own information, or another player's
-  Example: ?pl
-  Optional arguments: Player
+  ⋅⋅ Example: ?pl
+  ⋅⋅ Optional arguments: Player
 - players
   ⋅⋅ Shows a list of the players registered for the event
   Example: ?players
 - bonus
   ⋅⋅ Shows the bonus that a player has for any ability roll
-  Example: ?b tek -> would show any bonus tek related, if no arguments, will show any bonus that has any points on
-  Optional arguments: any word works as a search
+  ⋅⋅ Example: ?b tek -> would show any bonus tek related, if no arguments, will show any bonus that has any points on
+  ⋅⋅ Optional arguments: any word works as a search
 - addplayerclass
   ⋅⋅ Adds a classification to the player
-  Example: /addplayerclass Drykolf Bird
-  Required arguments: Player, Classification (choices)
+  ⋅⋅ Example: /addplayerclass Drykolf Bird
+  ⋅⋅ Required arguments: Player, Classification (choices)
 - delplayerclass
   ⋅⋅ Removes a classification from the player
-  Example: /delplayerclass Drykolf Bird
-  Required arguments: Player, Classification (choices)
+  ⋅⋅ Example: /delplayerclass Drykolf Bird
+  ⋅⋅ Required arguments: Player, Classification (choices)
 - addplayercap
   ⋅⋅ Adds a capacity to the player
-  Example: /addplayercap Drykolf Execute
-  Required arguments: Player, Capacity (choices)
+  ⋅⋅ Example: /addplayercap Drykolf Execute
+  ⋅⋅ Required arguments: Player, Capacity (choices)
 - addplayercap
   ⋅⋅ Adds a capacity to the player
-  Example: /addplayercap Drykolf Execute
-  Required arguments: Player, Capacity (choices)
+  ⋅⋅ Example: /addplayercap Drykolf Execute
+  ⋅⋅ Required arguments: Player, Capacity (choices)
 - delplayercap
   ⋅⋅ Removes a capacity from the player
-  Example: /delplayercap Drykolf Execute
-  Required arguments: Player, Capacity (choices)
+  ⋅⋅ Example: /delplayercap Drykolf Execute
+  ⋅⋅ Required arguments: Player, Capacity (choices)
 - setbonus
   ⋅⋅ Updates bonuses from the player, the bonus can be a direct value (2), or an addition/subtraction over the old bonus (+3)
-  Example: /setbonus Drykolf Hunting +2
-  Required arguments: Player, ability (choices), bonus
+  ⋅⋅ Example: /setbonus Drykolf Hunting +2
+  ⋅⋅ Required arguments: Player, ability (choices), bonus
 
 ###### TODO:
 
