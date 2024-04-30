@@ -124,49 +124,49 @@ Player information, this is where each player can be registered, updated, or del
 
 - players
 
-  Shows a list of the players registered for the event
+  Shows a list of the players registered for the event  
   Example: ?players
 
 - bonus
 
   Shows the bonus that a player has for any ability roll  
-  Example: ?b tek -> would show any bonus tek related, if no arguments, will show any bonus that has any points on
+  Example: ?b tek -> would show any bonus tek related, if no arguments, will show any bonus that has any points on  
   Optional arguments: any word works as a search
 
 - addplayerclass
 
-  Adds a classification to the player
-  Example: /addplayerclass Drykolf Bird
+  Adds a classification to the player  
+  Example: /addplayerclass Drykolf Bird  
   Required arguments: Player, Classification (choices)
 
 - delplayerclass
 
-  Removes a classification from the player
-  Example: /delplayerclass Drykolf Bird
+  Removes a classification from the player  
+  Example: /delplayerclass Drykolf Bird  
   Required arguments: Player, Classification (choices)
 
 - addplayercap
 
-  Adds a capacity to the player
-  Example: /addplayercap Drykolf Execute
+  Adds a capacity to the player  
+  Example: /addplayercap Drykolf Execute  
   Required arguments: Player, Capacity (choices)
 
 - addplayercap
 
-  Adds a capacity to the player
-  Example: /addplayercap Drykolf Execute
+  Adds a capacity to the player  
+  Example: /addplayercap Drykolf Execute  
   Required arguments: Player, Capacity (choices)
 
 - delplayercap
 
-  Removes a capacity from the player
-  Example: /delplayercap Drykolf Execute
+  Removes a capacity from the player  
+  Example: /delplayercap Drykolf Execute  
   Required arguments: Player, Capacity (choices)
 
 - setbonus
 
-  Updates bonuses from the player, the bonus can be a direct value (2), or an addition/subtraction over the old bonus (+3)
-  Example: /setbonus Drykolf Hunting +2
+  Updates bonuses from the player, the bonus can be a direct value (2), or an addition/subtraction over the old bonus (+3)  
+  Example: /setbonus Drykolf Hunting +2  
   Required arguments: Player, ability (choices), bonus
 
 ###### TODO:
