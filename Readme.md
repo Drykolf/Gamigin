@@ -91,10 +91,12 @@ Player information, this is where each player can be registered, updated, or del
 | /bonus, ?b      |     both     |   any |
 
 - addplayer
-  ⋅⋅⋅This one registers a player as a participant for the event. A player must be registered before updating any information from him/her.
-  ⋅⋅⋅Example: /addplayer Drykolf 'Phoenix' 'Yela'
-  ⋅⋅⋅Required arguments: Player, Chosen dino (choices), Dino name
-  ⋅⋅⋅Optional arguments: None
+
+  ⋅⋅⋅This one registers a player as a participant for the event. A player must be registered before updating any information from him/her.⋅⋅
+  ⋅⋅⋅Example: /addplayer Drykolf 'Phoenix' 'Yela'⋅⋅
+  ⋅⋅⋅Required arguments: Player, Chosen dino (choices), Dino name⋅⋅
+  ⋅⋅⋅Optional arguments: None⋅⋅
+
 - setplayer
   ⋅⋅⋅Updates a player information.
   ⋅⋅⋅Example: /setplayer Drykolf
