@@ -156,3 +156,15 @@ async def get_player_absbonuses(pool, player:str) -> list:
             print(e)
             data = None
         return data
+    
+async def get_inventory(pool) -> list:
+    async with pool.acquire() as connection:
+        query = '''SELECT * FROM GroupInventory'''
+        try:
+            rows = await connection.fetch(query)
+            data = [list(row.values()) for row in rows]
+        except Exception as e:
+            print(e)
+            data = None
+        return data
+    

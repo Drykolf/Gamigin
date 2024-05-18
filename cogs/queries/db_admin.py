@@ -435,6 +435,7 @@ async def delete_item(pool, item_name:str) -> str:
             print(e)
             return None
 
+
 async def get_caravan(pool) -> list:
     async with pool.acquire() as connection:
         query = '''SELECT * FROM Caravan'''

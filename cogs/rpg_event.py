@@ -17,6 +17,29 @@ class RPG_Event(commands.Cog):
             return False
         return True
     
+    def formatInventory(self, items):
+        embedMsg = Embed(title='Group Inventory', description='Everything the group has collected:')
+        itemClasses = []
+        for item in items:
+            if item[3] not in itemClasses:
+                itemClasses.append(item[3])
+        for clas in itemClasses:
+            itemCategories = []
+            content = ''
+            embedMsg.add_field(name=clas.upper(), value='\u200b', inline=True)
+            for item in items:
+                if item[3] == clas:
+                    if item[4] not in itemCategories:
+                        itemCategories.append(item[4])
+            for cat in itemCategories:
+                content += f'**{cat}**\n'
+                for item in items:
+                    if item[3] == clas and item[4] == cat:
+                        content += f'{item[1]}: x{item[2]}\n'
+            embedMsg.add_field(name='\u200b',value=content, inline=True)
+            embedMsg.add_field(name='\u200b', value='\u200b', inline=True)
+        return embedMsg
+    
     @commands.Cog.listener()
     async def on_ready(self):
         print('RPG cog is ready!')
@@ -83,6 +106,17 @@ class RPG_Event(commands.Cog):
                 await self.update_notes_msg(ctx)
         else: msg = 'Error deleting note'
         await ctx.send(msg)
+    
+    @commands.hybrid_command(name='notes', aliases=['ns'])
+    async def show_notes(self, ctx: Context):
+        '''Shows the group notes'''
+        result = await rpgDb.get_notes(self.bot.dbPool)
+        if result is None:
+            await ctx.send('Error fetching notes')
+            return
+        notes = '\n'.join([f'{note[0]}: {note[1]}' for note in result])
+        embedMsg = Embed(title='Group Notes', description=notes)
+        await ctx.send(embed=embedMsg)
         
     @commands.hybrid_command(name='dinos')
     async def show_dino_types(self, ctx: Context, *, args: Optional[str] = ''):
@@ -265,6 +299,16 @@ class RPG_Event(commands.Cog):
             await menu.start(ctx)
         except Exception as e:
             print(e)
+            
+    @commands.hybrid_command(name='inventory', aliases=['inv'])
+    async def get_inventory(self, ctx: Context):
+        '''Shows the group inventory'''
+        result = await rpgDb.get_inventory(self.bot.dbPool)
+        if result is None:
+            await ctx.send('Error fetching inventory')
+            return
+        embedMsg = self.formatInventory(result)
+        await ctx.send(embed=embedMsg)
         
 async def setup(bot):
     await bot.add_cog(RPG_Event(bot))

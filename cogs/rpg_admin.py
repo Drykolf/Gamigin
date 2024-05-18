@@ -1,5 +1,4 @@
 from re import search
-from tkinter import E
 from typing import Optional
 from discord.ext import commands
 from discord import Embed, Interaction, Member, NotFound, app_commands, TextChannel
@@ -518,6 +517,7 @@ class RPG_Admin(commands.Cog):
                 msg = f'{item} deleted'
         else: msg = f'Error: Failed to delete {item}'
         await interaction.followup.send(msg)
+        
         
     #TODO autocomplete dinoTpe
     @app_commands.command(name='addcaravan')
